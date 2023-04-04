@@ -8,6 +8,9 @@ import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 import ClipLoader from "react-spinners/ClipLoader";
 import { useNavigate } from 'react-router-dom';
+import { ref, uploadBytes, getdownloadURl } from 'firebase/storage';
+import firebase from 'firebase';
+
 // @mui
 import {
     Card,
@@ -37,6 +40,7 @@ import { LoadingButton } from '@mui/lab';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
+import storage from '../urls/firebase';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 
@@ -182,26 +186,67 @@ export default function Promotions() {
     };
 
     const onFileUpload = async () => {
-        // Create an object of formData
-        const formData = new FormData();
 
-        // Update the formData object
-        formData.append('image', selectedFile, selectedFile.name);
-
-        // Details of the uploaded file
-        console.log(selectedFile);
-
-        // Request made to the backend api
-        // Send formData object
         setLoading(true)
-        const res = await axios.post('https://swrielapp.onrender.com/imageupload', formData);
-        console.log(res, 'res');
-        setLoading(false)
-        setIsImageUploaded(false);
-        if (res.data.path) {
-            setPromoImg(res.data.path);
-            alert("image uploaded")
-        }
+        const storageRef = firebase.storage().ref(`images/${selectedFile.name}`);
+        const uploadTask = storageRef.put(selectedFile);
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log(`Upload is ${progress}% done`);
+            },
+            (error) => {
+                setLoading(false)
+                // Handle unsuccessful uploads
+                alert(error);
+            },
+            () => {
+                // Handle successful uploads on complete
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    console.log('File available at', downloadURL);
+                    alert("Image Uploaded")
+                    setLoading(false)
+                    setIsImageUploaded(false);
+                    setPromoImg(downloadURL)
+                    // console.lo(downloadURL);
+                });
+            }
+        );
+
+
+
+
+        // storage.ref(`/images/${selectedFile.name}`).put(selectedFile)
+        //     .on("state_changed", alert("success"), alert).getDownloadURL().then((downloadURL) => {
+        //         console.log(`File available at ${downloadURL}`);
+        //     });;
+        // const storageRef = ref(storage, `/images/${selectedFile.name}`);
+        // uploadBytes(storageRef, file).then((snapshot) => {
+        //     console.log('uploaded');
+        //     getDownloadURL(snapshot.ref).then(url => console.log(url));
+        // });
+        // Create an object of formData
+        // const formData = new FormData();
+
+        // // Update the formData object
+        // formData.append('image', selectedFile, selectedFile.name);
+
+        // // Details of the uploaded file
+        // console.log(selectedFile);
+
+        // // Request made to the backend api
+        // // Send formData object
+        // setLoading(true)
+        // const res = await axios.post('https://swrielapp.onrender.com/imageupload', formData);
+        // console.log(res, 'res');
+        // setLoading(false)
+        // setIsImageUploaded(false);
+        // if (res.data.path) {
+        //     setPromoImg(res.data.path);
+        //     alert("image uploaded")
+        // }
     };
 
     const uploadService = async () => {
@@ -402,7 +447,7 @@ export default function Promotions() {
 
                                                 <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <img src={`https://swrielapp.onrender.com/${promoImg}`} alt={promoname} style={{ height: 80, width: 80, alignSelf: 'center', margin: 10 }} />
+                                                        <img src={promoImg} alt={promoname} style={{ height: 80, width: 80, alignSelf: 'center', margin: 10 }} />
                                                     </Stack>
                                                 </TableCell>
 

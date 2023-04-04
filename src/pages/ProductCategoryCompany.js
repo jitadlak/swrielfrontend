@@ -8,6 +8,8 @@ import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 import ClipLoader from "react-spinners/ClipLoader";
 import { useNavigate } from 'react-router-dom';
+import { ref, uploadBytes, getdownloadURl } from 'firebase/storage';
+import firebase from 'firebase';
 // @mui
 import {
     Card,
@@ -34,6 +36,7 @@ import {
 
 import { LoadingButton } from '@mui/lab';
 // components
+import storage from '../urls/firebase';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -183,22 +186,33 @@ export default function ProductCategoryCompany() {
 
     const onFileUpload = async () => {
         // Create an object of formData
-        const formData = new FormData();
-
-        // Update the formData object
-        formData.append('image', selectedFile, selectedFile.name);
-
-        // Details of the uploaded file
-        console.log(selectedFile);
-
-        // Request made to the backend api
-        // Send formData object
         setLoading(true)
-        const res = await axios.post('https://swrielapp.onrender.com/imageupload', formData);
-        console.log(res, 'res');
-        setLoading(false)
-        setIsImageUploaded(false);
-        setImagePath(res.data.path);
+        const storageRef = firebase.storage().ref(`images/${selectedFile.name}`);
+        const uploadTask = storageRef.put(selectedFile);
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log(`Upload is ${progress}% done`);
+            },
+            (error) => {
+                setLoading(false)
+                // Handle unsuccessful uploads
+                alert(error);
+            },
+            () => {
+                // Handle successful uploads on complete
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    console.log('File available at', downloadURL);
+                    alert("Image Uploaded")
+                    setLoading(false)
+                    setIsImageUploaded(false);
+                    setImagePath(downloadURL)
+                    // console.lo(downloadURL);
+                });
+            }
+        );
     };
 
     const uploadService = async () => {
@@ -416,7 +430,7 @@ export default function ProductCategoryCompany() {
                                                     </Stack>
                                                 </TableCell> */}
                                                 <TableCell align="left">{_id}</TableCell>
-                                                <TableCell align="left">      <img src={`https://swrielapp.onrender.com/${productImage}`} alt={productImage} style={{ height: 100, width: 100, margin: 20, }} /></TableCell>
+                                                <TableCell align="left">      <img src={productImage} alt={productImage} style={{ height: 100, width: 100, margin: 20, }} /></TableCell>
                                                 <TableCell align="left">{productName}</TableCell>
 
                                                 <TableCell align="left">{productPrice} ₹</TableCell>

@@ -31,6 +31,7 @@ export default function LoginForm() {
     };
     console.log(data, 'data');
     try {
+      setLoading(true)
       const result = await axios.post('https://swrielapp.onrender.com/admin/signin', data, {
         headers: {
           'Content-Type': 'application/json',
@@ -38,6 +39,7 @@ export default function LoginForm() {
       });
       // setLoading(false);
       console.log(result, 'result');
+      setLoading(false)
       if (result.data.status === 400) {
         toast(result.data.message);
       }
@@ -47,7 +49,7 @@ export default function LoginForm() {
         navigate('/dashboard', { replace: false });
       }
     } catch (error) {
-      // setLoading(false);
+      setLoading(false);
       console.log(error, 'error');
     }
   };
