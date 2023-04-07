@@ -130,7 +130,7 @@ export default function ProductOrders() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allproductbooked');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allproductbooked');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {

@@ -140,7 +140,7 @@ export default function Promotions() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allpromos');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allpromos');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -156,7 +156,7 @@ export default function Promotions() {
 
     // const fetchUser2 = async () => {
     //     try {
-    //         const res = await axios.get('http://localhost:8000/admin/allproducts');
+    //         const res = await axios.get('https://swrielapp.onrender.com/admin/allproducts');
     //         console.log(res, 'res');
     //         if (res.data.status === 400) {
     //             alert(res.data.message);
@@ -171,7 +171,7 @@ export default function Promotions() {
     const deleteFunc = async (id) => {
         try {
             setLoading(true)
-            const res = await axios.delete(`http://localhost:8000/admin/deletepromotion/${id}`);
+            const res = await axios.delete(`https://swrielapp.onrender.com/admin/deletepromotion/${id}`);
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -239,7 +239,7 @@ export default function Promotions() {
         // // Request made to the backend api
         // // Send formData object
         // setLoading(true)
-        // const res = await axios.post('http://localhost:8000/imageupload', formData);
+        // const res = await axios.post('https://swrielapp.onrender.com/imageupload', formData);
         // console.log(res, 'res');
         // setLoading(false)
         // setIsImageUploaded(false);
@@ -261,7 +261,7 @@ export default function Promotions() {
             };
             setLoading(true)
             console.log(dataobj, 'data obj');
-            const res = await axios.post('http://localhost:8000/admin/addpromos', dataobj,);
+            const res = await axios.post('https://swrielapp.onrender.com/admin/addpromos', dataobj,);
             console.log(res, 'resaddcategory');
             setLoading(false)
             if (res.data.status === 400) {

@@ -126,7 +126,7 @@ export default function ServiceProviderWithDrawRequest() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/user/provider/allrequests');
+            const res = await axios.get('https://swrielapp.onrender.com/user/provider/allrequests');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -142,7 +142,7 @@ export default function ServiceProviderWithDrawRequest() {
 
     const deleteFunc = async (id) => {
         try {
-            const res = await axios.delete(`http://localhost:8000/admin/deleteproduct/${id}`);
+            const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteproduct/${id}`);
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data.message);

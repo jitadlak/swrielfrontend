@@ -109,7 +109,7 @@ export default function UserPage() {
     try {
       setLoading(true)
 
-      const res = await axios.get('http://localhost:8000/user/users');
+      const res = await axios.get('https://swrielapp.onrender.com/user/users');
       console.log(res, 'res');
       setLoading(false)
       if (res.data.status === 400) {

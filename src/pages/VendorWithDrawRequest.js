@@ -126,7 +126,7 @@ export default function VendorWithDrawRequest() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/user/vendor/allrequests');
+            const res = await axios.get('https://swrielapp.onrender.com/user/vendor/allrequests');
             setLoading(false)
             console.log(res, 'res');
             if (res.data.status === 400) {

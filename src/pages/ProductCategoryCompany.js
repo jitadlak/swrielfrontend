@@ -153,7 +153,7 @@ export default function ProductCategoryCompany() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allproductslists');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allproductslists');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -170,7 +170,7 @@ export default function ProductCategoryCompany() {
     const fetchUser2 = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allproductcategory');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allproductcategory');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -187,7 +187,7 @@ export default function ProductCategoryCompany() {
     const fetchUser3 = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allcompany');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allcompany');
             console.log(res, 'company');
             setLoading(false)
             if (res.data.status === 400) {
@@ -203,7 +203,7 @@ export default function ProductCategoryCompany() {
 
     // const deleteFunc = async (id) => {
     //     try {
-    //         const res = await axios.delete(`http://localhost:8000/admin/deleteservicecategory/${id}`);
+    //         const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteservicecategory/${id}`);
     //         console.log(res, 'res');
     //         if (res.data.status === 400) {
     //             alert(res.data.message);
@@ -259,7 +259,7 @@ export default function ProductCategoryCompany() {
             };
             console.log(dataobj, 'data obj');
             setLoading(true)
-            const res = await axios.post('http://localhost:8000/admin/addProductList', dataobj,);
+            const res = await axios.post('https://swrielapp.onrender.com/admin/addProductList', dataobj,);
             setLoading(false)
             console.log(res, 'resaddcategory');
             if (res.data.status === 400) {
@@ -289,7 +289,7 @@ export default function ProductCategoryCompany() {
             }
 
             // console.log(data, 'update balance api')
-            const res = await axios.patch('http://localhost:8000/admin/updateprice', data);
+            const res = await axios.patch('https://swrielapp.onrender.com/admin/updateprice', data);
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data?.message);
@@ -536,7 +536,7 @@ export default function ProductCategoryCompany() {
 
                                                 {/* <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <img src={`http://localhost:8000/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
+                                                        <img src={`https://swrielapp.onrender.com/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
                                                     </Stack>
                                                 </TableCell> */}
                                                 <TableCell align="left">{_id}</TableCell>

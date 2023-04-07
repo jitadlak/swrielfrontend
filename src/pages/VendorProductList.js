@@ -130,7 +130,7 @@ export default function VendorProductList() {
 
     const fetchUser = async () => {
         try {
-            const res = await axios.get(`http://localhost:8000/user/vendor/allproducts/${state._id}`);
+            const res = await axios.get(`https://swrielapp.onrender.com/user/vendor/allproducts/${state._id}`);
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data.message);
@@ -251,12 +251,12 @@ export default function VendorProductList() {
 
                                                 {/* <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <img src={`http://localhost:8000/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
+                                                        <img src={`https://swrielapp.onrender.com/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
                                                     </Stack>
                                                 </TableCell> */}
                                                 <TableCell align="left">{_id}</TableCell>
 
-                                                <TableCell align="left">      <img src={`http://localhost:8000/${productImage}`} alt={productImage} style={{ height: 100, width: 100, margin: 20, }} /></TableCell>
+                                                <TableCell align="left">      <img src={`https://swrielapp.onrender.com/${productImage}`} alt={productImage} style={{ height: 100, width: 100, margin: 20, }} /></TableCell>
                                                 <TableCell align="left">{productName}</TableCell>
 
                                                 <TableCell align="left">{productPrice}</TableCell>

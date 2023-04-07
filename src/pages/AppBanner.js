@@ -128,7 +128,7 @@ export default function AppBanner() {
 
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allbanners');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allbanners');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -145,7 +145,7 @@ export default function AppBanner() {
     const deleteFunc = async (id) => {
         try {
             setLoading(true)
-            const res = await axios.delete(`http://localhost:8000/admin/deletebanner/${id}`);
+            const res = await axios.delete(`https://swrielapp.onrender.com/admin/deletebanner/${id}`);
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -204,7 +204,7 @@ export default function AppBanner() {
             };
             console.log(dataobj, 'data obj');
             setLoading(true)
-            const res = await axios.post('http://localhost:8000/admin/addbanner', dataobj);
+            const res = await axios.post('https://swrielapp.onrender.com/admin/addbanner', dataobj);
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {

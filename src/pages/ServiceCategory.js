@@ -129,7 +129,7 @@ export default function ServiceCategory() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allservicecategory');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allservicecategory');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -145,7 +145,7 @@ export default function ServiceCategory() {
 
     const fetchUser2 = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/admin/allservices');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allservices');
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data.message);
@@ -160,7 +160,7 @@ export default function ServiceCategory() {
     const deleteFunc = async (id) => {
         try {
             setLoading(true)
-            const res = await axios.delete(`http://localhost:8000/admin/deleteservicecategory/${id}`);
+            const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteservicecategory/${id}`);
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -186,7 +186,7 @@ export default function ServiceCategory() {
 
         // Request made to the backend api
         // Send formData object
-        const res = await axios.post('http://localhost:8000/imageupload', formData);
+        const res = await axios.post('https://swrielapp.onrender.com/imageupload', formData);
         console.log(res, 'res');
         setIsImageUploaded(false);
         setImagePath(res.data.path);
@@ -206,7 +206,7 @@ export default function ServiceCategory() {
             };
             console.log(dataobj, 'data obj');
             setLoading(true)
-            const res = await axios.post('http://localhost:8000/admin/addcategory', dataobj,);
+            const res = await axios.post('https://swrielapp.onrender.com/admin/addcategory', dataobj,);
             console.log(res, 'resaddcategory');
             setLoading(false)
             if (res.data.status === 400) {
@@ -388,7 +388,7 @@ export default function ServiceCategory() {
 
                                                 {/* <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <img src={`http://localhost:8000/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
+                                                        <img src={`https://swrielapp.onrender.com/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
                                                     </Stack>
                                                 </TableCell> */}
                                                 <TableCell align="left">{_id}</TableCell>

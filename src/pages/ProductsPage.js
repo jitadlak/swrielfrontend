@@ -128,7 +128,7 @@ export default function ProductPage() {
 
     try {
       setLoading(true)
-      const res = await axios.get('http://localhost:8000/admin/allservices');
+      const res = await axios.get('https://swrielapp.onrender.com/admin/allservices');
       console.log(res, 'res');
       setLoading(false)
       if (res.data.status === 400) {
@@ -145,7 +145,7 @@ export default function ProductPage() {
   const deleteFunc = async (id) => {
     try {
       setLoading(true)
-      const res = await axios.delete(`http://localhost:8000/admin/deleteservice/${id}`);
+      const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteservice/${id}`);
       console.log(res, 'res');
       setLoading(false)
       if (res.data.status === 400) {
@@ -206,7 +206,7 @@ export default function ProductPage() {
     // // Request made to the backend api
     // // Send formData object
     // setLoading(true)
-    // const res = await axios.post('http://localhost:8000/imageupload', formData);
+    // const res = await axios.post('https://swrielapp.onrender.com/imageupload', formData);
     // console.log(res, 'res');
     // setLoading(false)
     // setIsImageUploaded(false);
@@ -230,7 +230,7 @@ export default function ProductPage() {
       };
       console.log(dataobj, 'data obj');
       setLoading(true)
-      const res = await axios.post('http://localhost:8000/admin/addservice', dataobj);
+      const res = await axios.post('https://swrielapp.onrender.com/admin/addservice', dataobj);
       console.log(res, 'res');
       setLoading(false)
       if (res.data.status === 400) {

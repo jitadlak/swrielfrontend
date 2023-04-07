@@ -131,7 +131,7 @@ export default function ServiceSubCategory() {
     const fetchUser = async () => {
         try {
             setLoading(true);
-            const res = await axios.get('http://localhost:8000/admin/allservicesubcategory');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allservicesubcategory');
             console.log(res, 'res');
             setLoading(false);
             if (res.data.status === 400) {
@@ -147,7 +147,7 @@ export default function ServiceSubCategory() {
 
     const fetchUser2 = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/admin/allservicecategory');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allservicecategory');
             console.log(res, 'res');
             setLoading(false);
             if (res.data.status === 400) {
@@ -164,7 +164,7 @@ export default function ServiceSubCategory() {
     const deleteFunc = async (id) => {
         try {
             setLoading(true);
-            const res = await axios.delete(`http://localhost:8000/admin/deleteservicesubcategory/${id}`);
+            const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteservicesubcategory/${id}`);
             console.log(res, 'res');
             setLoading(false);
             if (res.data.status === 400) {
@@ -188,7 +188,7 @@ export default function ServiceSubCategory() {
             };
             setLoading(true);
             console.log(dataobj, 'data obj');
-            const res = await axios.post('http://localhost:8000/admin/category/addsubcategory', dataobj);
+            const res = await axios.post('https://swrielapp.onrender.com/admin/category/addsubcategory', dataobj);
             setLoading(false);
             console.log(res, 'resaddcategory');
             if (res.data.status === 400) {
@@ -371,7 +371,7 @@ export default function ServiceSubCategory() {
 
                                                 {/* <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <img src={`http://localhost:8000/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
+                                                        <img src={`https://swrielapp.onrender.com/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
                                                     </Stack>
                                                 </TableCell> */}
                                                 <TableCell align="left">{_id}</TableCell>

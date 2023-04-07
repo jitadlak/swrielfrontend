@@ -129,7 +129,7 @@ export default function ServiceOrders() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allservicebooked');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allservicebooked');
             setLoading(false)
             console.log(res, 'res');
             if (res.data.status === 400) {
@@ -155,7 +155,7 @@ export default function ServiceOrders() {
 
         // Request made to the backend api
         // Send formData object
-        const res = await axios.post('http://localhost:8000/imageupload', formData);
+        const res = await axios.post('https://swrielapp.onrender.com/imageupload', formData);
         console.log(res, 'res');
         setIsImageUploaded(false);
         setImagePath(res.data.path);
@@ -168,7 +168,7 @@ export default function ServiceOrders() {
                 productImage: imagePath,
             };
             console.log(dataobj, 'data obj');
-            const res = await axios.post('http://localhost:8000/admin/addproduct', dataobj);
+            const res = await axios.post('https://swrielapp.onrender.com/admin/addproduct', dataobj);
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data.message);

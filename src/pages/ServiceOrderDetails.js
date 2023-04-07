@@ -44,7 +44,7 @@ export default function ServiceOrderDetails() {
 
     const _getAllProvider = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/user/provider/all', {});
+            const res = await axios.get('https://swrielapp.onrender.com/user/provider/all', {});
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data.message);
@@ -65,7 +65,7 @@ export default function ServiceOrderDetails() {
             }
 
             // console.log(data, 'update balance api')
-            const res = await axios.patch('http://localhost:8000/admin/serviceAssign', data);
+            const res = await axios.patch('https://swrielapp.onrender.com/admin/serviceAssign', data);
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data?.message);

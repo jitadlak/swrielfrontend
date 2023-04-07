@@ -127,7 +127,7 @@ export default function AllBanksDetails() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/user/allbanks');
+            const res = await axios.get('https://swrielapp.onrender.com/user/allbanks');
             setLoading(false)
             console.log(res, 'res');
             if (res.data.status === 400) {

@@ -127,7 +127,7 @@ export default function Feedbacks() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/admin/allfeedback');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allfeedback');
             setLoading(false)
             console.log(res, 'res');
             if (res.data.status === 400) {
