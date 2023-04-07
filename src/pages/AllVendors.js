@@ -122,7 +122,7 @@ export default function AllVendors() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('https://swrielapp.onrender.com/user/vendor/all');
+            const res = await axios.get('http://localhost:8000/user/vendor/all');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -147,7 +147,7 @@ export default function AllVendors() {
 
             // console.log(data, 'update balance api')
             setLoading(true)
-            const res = await axios.patch('https://swrielapp.onrender.com/user/updatewalletvendor', data);
+            const res = await axios.patch('http://localhost:8000/user/updatewalletvendor', data);
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {

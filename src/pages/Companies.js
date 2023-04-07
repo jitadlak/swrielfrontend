@@ -1,14 +1,16 @@
 
-
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 import ClipLoader from "react-spinners/ClipLoader";
+import { useNavigate } from 'react-router-dom';
+import { ref, uploadBytes, getdownloadURl } from 'firebase/storage';
+import firebase from 'firebase';
+
 // @mui
 import {
     Card,
@@ -38,6 +40,7 @@ import { LoadingButton } from '@mui/lab';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
+import storage from '../urls/firebase';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 
@@ -46,17 +49,12 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
+    { id: 'companylogo', label: 'Company Logo', alignRight: false },
+    { id: 'companyid', label: 'Company Id', alignRight: false },
+    { id: 'companyname', label: 'Company Name', alignRight: false },
 
-    { id: 'vendorId', label: 'Vendor ID', alignRight: false },
-    { id: 'amount', label: 'Withdrawal Amount', alignRight: false },
-    { id: 'approved', label: 'Approved Status', alignRight: false },
+    { id: 'editdelete', label: 'Delete', alignRight: false },
 
-    // { id: 'approve', label: 'Approve', alignRight: false },
-    // { id: 'email', label: 'Email', alignRight: false },
-    // { id: 'phone', label: 'Phone', alignRight: false },
-    // { id: 'address', label: 'Address', alignRight: false },
-    // { id: 'city', label: 'City', alignRight: false },
-    // { id: 'state', label: 'State', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -85,21 +83,22 @@ function applySortFilter(array, comparator, query) {
         return a[1] - b[1];
     });
     if (query) {
-        return filter(array, (_user) => _user.serviceprovider.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        return filter(array, (_user) => _user.promoname.toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
 }
 
-export default function VendorWithDrawRequest() {
+export default function Companies() {
     const [open, setOpen] = useState(null);
     const navigate = useNavigate();
     const [page, setPage] = useState(0);
-
+    const [loading, setLoading] = useState(false);
     const [order, setOrder] = useState('asc');
 
     const [selected, setSelected] = useState([]);
     const [USERLIST, setUserList] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [productList, setProductList] = useState([]);
+
     const [orderBy, setOrderBy] = useState('name');
 
     const [filterName, setFilterName] = useState('');
@@ -109,7 +108,15 @@ export default function VendorWithDrawRequest() {
     const [open2, setOpen2] = useState(false);
     const [isImgUploaded, setIsImageUploaded] = useState(true);
     const [imagePath, setImagePath] = useState('');
-    const [productName, setProduct] = useState('');
+
+    const [promoname, setPromoName] = useState('');
+    const [percentoff, setPercentOff] = useState('');
+    const [promocode, setPromocode] = useState('');
+    const [validtill, setValid] = useState('');
+    const [promodescription, setPromoDescription] = useState('');
+    const [promoImg, setPromoImg] = useState('');
+
+    const [productId, setProductId] = useState('');
     const onOpenModal = () => setOpen2(true);
     const onCloseModal = () => setOpen2(false);
 
@@ -126,9 +133,9 @@ export default function VendorWithDrawRequest() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('http://localhost:8000/user/vendor/allrequests');
-            setLoading(false)
+            const res = await axios.get('http://localhost:8000/admin/allcompany');
             console.log(res, 'res');
+            setLoading(false)
             if (res.data.status === 400) {
                 alert(res.data.message);
             } else {
@@ -140,8 +147,130 @@ export default function VendorWithDrawRequest() {
         }
     };
 
+    // const fetchUser2 = async () => {
+    //     try {
+    //         const res = await axios.get('http://localhost:8000/admin/allproducts');
+    //         console.log(res, 'res');
+    //         if (res.data.status === 400) {
+    //             alert(res.data.message);
+    //         } else {
+    //             setProductList(res.data.result);
+    //         }
+    //     } catch (error) {
+    //         console.log(error, 'error');
+    //     }
+    // };
+
+    const deleteFunc = async (id) => {
+        try {
+            setLoading(true)
+            const res = await axios.delete(`http://localhost:8000/admin/deletecompany/${id}`);
+            console.log(res, 'res');
+            setLoading(false)
+            if (res.data.status === 400) {
+                alert(res.data.message);
+            } else {
+                fetchUser();
+            }
+        } catch (error) {
+            setLoading(false)
+            console.log(error, 'error');
+        }
+    };
+
+    const onFileUpload = async () => {
+
+        setLoading(true)
+        const storageRef = firebase.storage().ref(`images/${selectedFile.name}`);
+        const uploadTask = storageRef.put(selectedFile);
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log(`Upload is ${progress}% done`);
+            },
+            (error) => {
+                setLoading(false)
+                // Handle unsuccessful uploads
+                alert(error);
+            },
+            () => {
+                // Handle successful uploads on complete
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    console.log('File available at', downloadURL);
+                    alert("Image Uploaded")
+                    setLoading(false)
+                    setIsImageUploaded(false);
+                    setPromoImg(downloadURL)
+                    // console.lo(downloadURL);
+                });
+            }
+        );
 
 
+
+
+        // storage.ref(`/images/${selectedFile.name}`).put(selectedFile)
+        //     .on("state_changed", alert("success"), alert).getDownloadURL().then((downloadURL) => {
+        //         console.log(`File available at ${downloadURL}`);
+        //     });;
+        // const storageRef = ref(storage, `/images/${selectedFile.name}`);
+        // uploadBytes(storageRef, file).then((snapshot) => {
+        //     console.log('uploaded');
+        //     getDownloadURL(snapshot.ref).then(url => console.log(url));
+        // });
+        // Create an object of formData
+        // const formData = new FormData();
+
+        // // Update the formData object
+        // formData.append('image', selectedFile, selectedFile.name);
+
+        // // Details of the uploaded file
+        // console.log(selectedFile);
+
+        // // Request made to the backend api
+        // // Send formData object
+        // setLoading(true)
+        // const res = await axios.post('http://localhost:8000/imageupload', formData);
+        // console.log(res, 'res');
+        // setLoading(false)
+        // setIsImageUploaded(false);
+        // if (res.data.path) {
+        //     setPromoImg(res.data.path);
+        //     alert("image uploaded")
+        // }
+    };
+
+    const uploadService = async () => {
+        try {
+            const dataobj = {
+                companyName: promoname,
+
+                companyLogo: promoImg
+            };
+            setLoading(true)
+            console.log(dataobj, 'data obj');
+            const res = await axios.post('http://localhost:8000/admin/addcompany', dataobj,);
+            console.log(res, 'resaddcategory');
+            setLoading(false)
+            if (res.data.status === 400) {
+                alert(res.data.message)
+            }
+            if (res.data.status === 200) {
+
+
+
+                setOpen2(false);
+                fetchUser()
+                alert("Company Added Successfully")
+            }
+        } catch (error) {
+            setLoading(false)
+            console.log(error);
+            alert("something went wrong")
+        }
+    };
 
     const handleOpenMenu = (event) => {
         setOpen(event.currentTarget);
@@ -214,11 +343,11 @@ export default function VendorWithDrawRequest() {
             <Container>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
-                        Store Vendor WithDrawal Requests
+                        Product Companies
                     </Typography>
-                    {/* <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
-                        Add Products
-                    </Button> */}
+                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
+                        Add Company
+                    </Button>
                 </Stack>
 
                 <Card>
@@ -233,6 +362,54 @@ export default function VendorWithDrawRequest() {
                             aria-label="Loading Spinner"
                             data-testid="loader"
                         />
+                        <Modal open={open2} onClose={onCloseModal} center>
+                            <Stack spacing={3}>
+                                <Typography variant="h3" gutterBottom>
+                                    Add Company
+                                </Typography>
+                                <TextField name="promoname" label="Promotion Name" onChange={(event) => setPromoName(event.target.value)} />
+
+                                <Typography variant="h6" gutterBottom>
+                                    Select Company Logo
+                                </Typography>
+                                <Input onChange={onFileChange} type="file" hidden />
+                                {loading ? <ClipLoader
+                                    color={'blue'}
+                                    loading={loading}
+
+                                    size={30}
+                                    aria-label="Loading Spinner"
+                                    data-testid="loader"
+                                /> : <Button variant="contained" component="label" onClick={onFileUpload}>
+                                    Upload File
+                                </Button>}
+                            </Stack>
+
+                            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+                                {/* <Checkbox name="remember" label="Remember me" />
+        <Link variant="subtitle2" underline="hover">
+          Forgot password?
+        </Link> */}
+                            </Stack>
+
+                            {loading ? <ClipLoader
+                                color={'blue'}
+                                loading={loading}
+
+                                size={30}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            /> : <LoadingButton
+                                fullWidth
+                                size="large"
+                                type="submit"
+                                variant="contained"
+                                disabled={isImgUploaded}
+                                onClick={uploadService}
+                            >
+                                Add
+                            </LoadingButton>}
+                        </Modal>
                         <TableContainer sx={{ minWidth: 800 }}>
                             <Table>
                                 <UserListHead
@@ -246,44 +423,31 @@ export default function VendorWithDrawRequest() {
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const { _id, amount, vendor, approved } = row;
-                                        const selectedUser = selected.indexOf(vendor) !== -1;
+                                        const { _id, companyName, companyLogo } = row;
+                                        const selectedUser = selected.indexOf(_id) !== -1;
 
                                         return (
-                                            <TableRow hover key={_id} tabIndex={-1} role="checkbox" selected={vendor}>
+                                            <TableRow hover key={_id} tabIndex={-1} role="checkbox" selected={companyName}>
                                                 <TableCell padding="checkbox">
-                                                    {/* <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, serviceprovider)} /> */}
+                                                    {/* <Checkbox checked={companyName} onChange={(event) => handleClick(event, promoname)} /> */}
                                                 </TableCell>
 
-                                                <TableCell align="left">{vendor}</TableCell>
+                                                <TableCell component="th" scope="row" padding="none">
+                                                    <Stack direction="row" alignItems="center" spacing={2}>
+                                                        <img src={companyLogo} alt={companyLogo} style={{ height: 80, width: 80, alignSelf: 'center', margin: 10 }} />
+                                                    </Stack>
+                                                </TableCell>
 
+                                                <TableCell align="left">{_id}</TableCell>
+                                                <TableCell align="left">{companyName}</TableCell>
 
-
-
-                                                <TableCell align="left">{amount}</TableCell>
-                                                {
-                                                    approved ? <TableCell align="left">APPROVED</TableCell> :
-                                                        <TableCell align="left">NOT APPROVED </TableCell>
-                                                }
-
-
-                                                {/* <TableCell align="left">
+                                                <TableCell align="left">
                                                     <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteFunc(_id)}>
                                                         <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
                                                         Delete
                                                     </MenuItem>
-                                                </TableCell> */}
-                                                {/* {approved ? <TableCell align="left">
-                                                    <MenuItem onClick={() => navigate('/dashboard/serviceorderdetails', { state: row })} style={{ backgroundColor: '#ffffff' }}>
-                                                        <Iconify icon={'eva:right'} sx={{ mr: 2 }} />
-                                                        Approved
-                                                    </MenuItem>
-                                                </TableCell> : <TableCell align="left">
-                                                    <MenuItem onClick={() => navigate('/dashboard/serviceorderdetails', { state: row })} style={{ backgroundColor: 'green', color: '#ffffff' }}>
-                                                        <Iconify icon={'eva:right'} sx={{ mr: 2 }} />
-                                                        Approve
-                                                    </MenuItem>
-                                                </TableCell>} */}
+                                                </TableCell>
+
                                             </TableRow>
                                         );
                                     })}

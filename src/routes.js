@@ -27,6 +27,7 @@ import Feedbacks from './pages/Feedbacks';
 import AppBanner from './pages/AppBanner';
 import AllBanksDetails from './pages/AllBanksDetails';
 import Offers from './pages/Offers';
+import Companies from './pages/Companies';
 
 
 // ----------------------------------------------------------------------
@@ -51,6 +52,7 @@ export default function Router() {
         { path: 'servicecategory', element: <ServiceCategory /> },
         { path: 'servicesubcategory', element: <ServiceSubCategory /> },
         { path: 'productcategory', element: <ProductCategory /> },
+        { path: 'companies', element: <Companies /> },
         { path: 'productcategorycompany', element: <ProductCategoryCompany /> },
         { path: 'promotions', element: <Promotions /> },
         { path: 'serviceorders', element: <ServiceOrders /> },

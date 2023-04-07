@@ -45,7 +45,7 @@ export default function ProductOrderDetails() {
 
     const _getAllProvider = async () => {
         try {
-            const res = await axios.get('https://swrielapp.onrender.com/user/vendor/all', {});
+            const res = await axios.get('http://localhost:8000/user/vendor/all', {});
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data.message);
@@ -66,7 +66,7 @@ export default function ProductOrderDetails() {
             }
 
             // console.log(data, 'update balance api')
-            const res = await axios.patch('https://swrielapp.onrender.com/admin/productAssign', data);
+            const res = await axios.patch('http://localhost:8000/admin/productAssign', data);
             console.log(res, 'res');
             if (res.data.status === 400) {
                 alert(res.data?.message);

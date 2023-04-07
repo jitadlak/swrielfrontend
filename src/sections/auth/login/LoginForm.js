@@ -32,7 +32,7 @@ export default function LoginForm() {
     console.log(data, 'data');
     try {
       setLoading(true)
-      const result = await axios.post('https://swrielapp.onrender.com/admin/signin', data, {
+      const result = await axios.post('http://localhost:8000/admin/signin', data, {
         headers: {
           'Content-Type': 'application/json',
         },

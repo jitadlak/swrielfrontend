@@ -57,7 +57,7 @@ const TABLE_HEAD = [
     { id: 'productCompany', label: 'Product Company', alignRight: false },
     { id: 'productSubcategory', label: 'Category', alignRight: false },
     { id: 'createdAt', label: 'createdAt', alignRight: false },
-    { id: 'delete', label: 'Delete', alignRight: false },
+    { id: 'update', label: 'Update Price', alignRight: false },
 
 
     // { id: 'phone', label: 'Phone', alignRight: false },
@@ -111,26 +111,37 @@ export default function ProductCategoryCompany() {
     const [orderBy, setOrderBy] = useState('name');
 
     const [filterName, setFilterName] = useState('');
-    const [currentUserId, setCurrentUserId] = useState('');
+    const [companyId, setCompanyId] = useState('');
     const [selectedFile, setselectedFile] = useState(null);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [open2, setOpen2] = useState(false);
+    const [open3, setOpen3] = useState(false);
     const [isImgUploaded, setIsImageUploaded] = useState(true);
     const [imagePath, setImagePath] = useState('');
-    const [productCategoryName, setProductCategory] = useState('');
-    const [productId, setProductId] = useState('');
+    const [newPrice, setNewPrice] = useState('');
+    const [updatedId, setupdateId] = useState('');
     const [productName, setProductName] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productTitle, setProductTitle] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [productCompany, setProductCompany] = useState('');
     const [productSubcategoryId, setProductSubcategoryId] = useState('');
+    const [company, setCompany] = useState([]);
     const onOpenModal = () => setOpen2(true);
     const onCloseModal = () => setOpen2(false);
+    const onOpenModal3 = (_id) => {
+        setupdateId(_id)
+        setOpen3(true);
+    }
+    const onCloseModal3 = () => {
+        setupdateId("")
+        setOpen3(false);
+    }
 
     useEffect(() => {
         fetchUser();
         fetchUser2();
+        fetchUser3()
         _getasync()
     }, []);
     const _getasync = async () => {
@@ -142,7 +153,7 @@ export default function ProductCategoryCompany() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('https://swrielapp.onrender.com/admin/allproductslists');
+            const res = await axios.get('http://localhost:8000/admin/allproductslists');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -158,21 +169,41 @@ export default function ProductCategoryCompany() {
 
     const fetchUser2 = async () => {
         try {
-            const res = await axios.get('https://swrielapp.onrender.com/admin/allproductcategory');
+            setLoading(true)
+            const res = await axios.get('http://localhost:8000/admin/allproductcategory');
             console.log(res, 'res');
+            setLoading(false)
             if (res.data.status === 400) {
                 alert(res.data.message);
             } else {
                 setProductList(res.data.result);
             }
         } catch (error) {
+            setLoading(false)
+            console.log(error, 'error');
+        }
+    };
+
+    const fetchUser3 = async () => {
+        try {
+            setLoading(true)
+            const res = await axios.get('http://localhost:8000/admin/allcompany');
+            console.log(res, 'company');
+            setLoading(false)
+            if (res.data.status === 400) {
+                alert(res.data.message);
+            } else {
+                setCompany(res.data.result);
+            }
+        } catch (error) {
+            setLoading(false)
             console.log(error, 'error');
         }
     };
 
     // const deleteFunc = async (id) => {
     //     try {
-    //         const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteservicecategory/${id}`);
+    //         const res = await axios.delete(`http://localhost:8000/admin/deleteservicecategory/${id}`);
     //         console.log(res, 'res');
     //         if (res.data.status === 400) {
     //             alert(res.data.message);
@@ -228,7 +259,7 @@ export default function ProductCategoryCompany() {
             };
             console.log(dataobj, 'data obj');
             setLoading(true)
-            const res = await axios.post('https://swrielapp.onrender.com/admin/addProductList', dataobj,);
+            const res = await axios.post('http://localhost:8000/admin/addProductList', dataobj,);
             setLoading(false)
             console.log(res, 'resaddcategory');
             if (res.data.status === 400) {
@@ -245,6 +276,33 @@ export default function ProductCategoryCompany() {
             setLoading(false)
             console.log(error);
             alert("something went wrong")
+        }
+    };
+
+
+    const updatePrice = async () => {
+        try {
+            const data = {
+                updatedId,
+                newPrice
+
+            }
+
+            // console.log(data, 'update balance api')
+            const res = await axios.patch('http://localhost:8000/admin/updateprice', data);
+            console.log(res, 'res');
+            if (res.data.status === 400) {
+                alert(res.data?.message);
+
+            } else {
+                setOpen3(false);
+                fetchUser()
+                alert(res.data?.result?.message);
+
+
+            }
+        } catch (error) {
+            console.log(error, 'error');
         }
     };
 
@@ -347,7 +405,7 @@ export default function ProductCategoryCompany() {
                                 <TextField name="Product Price" label="Product Price" onChange={(event) => setProductPrice(event.target.value)} />
                                 <TextField name="Product Title" label="Product Title" onChange={(event) => setProductTitle(event.target.value)} />
                                 <TextField name="Product Description" label="Product Description" onChange={(event) => setProductDescription(event.target.value)} />
-                                <TextField name="Product Company" label="Product Company" onChange={(event) => setProductCompany(event.target.value)} />
+                                {/* <TextField name="Product Company" label="Product Company" onChange={(event) => setProductCompany(event.target.value)} /> */}
 
                                 <Typography variant="h6" gutterBottom>
                                     Select Category
@@ -359,6 +417,18 @@ export default function ProductCategoryCompany() {
                                     <option value=" ">Choose</option>
                                     {productList.map((item, index) => {
                                         return <option value={item._id}>{item.categoryName}</option>
+                                    })}
+                                </select>
+                                <Typography variant="h6" gutterBottom>
+                                    Select Company
+                                </Typography>
+                                <select name="category" id="category" style={{ height: 40, borderRadius: 5 }}
+                                    onChange={(e) => setProductCompany(e.target.value)}
+
+                                >
+                                    <option value=" ">Choose</option>
+                                    {company.map((item, index) => {
+                                        return <option value={item._id}>{item.companyName}</option>
                                     })}
                                 </select>
                                 <Typography variant="h6" gutterBottom>
@@ -402,6 +472,46 @@ export default function ProductCategoryCompany() {
                                     Add
                                 </LoadingButton>}
                         </Modal>
+
+
+                        <Modal open={open3} onClose={onCloseModal3}  >
+                            <Stack spacing={4}>
+                                <Typography variant="h3" gutterBottom>
+                                    Update Product Price
+                                </Typography>
+
+                                <TextField name="Product Price" label="Product Price" onChange={(event) => setNewPrice(event.target.value)} />
+
+                                {/* <TextField name="Product Company" label="Product Company" onChange={(event) => setProductCompany(event.target.value)} /> */}
+
+                            </Stack>
+
+                            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+                                {/* <Checkbox name="remember" label="Remember me" />
+        <Link variant="subtitle2" underline="hover">
+          Forgot password?
+        </Link> */}
+                            </Stack>
+                            {loading ? <ClipLoader
+                                color={'blue'}
+                                loading={loading}
+
+                                size={30}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            /> :
+                                <LoadingButton
+                                    fullWidth
+                                    size="large"
+                                    type="submit"
+                                    variant="contained"
+
+                                    onClick={updatePrice}
+                                >
+                                    Update
+                                </LoadingButton>}
+                        </Modal>
+
                         <TableContainer sx={{ minWidth: 800 }}>
                             <Table>
                                 <UserListHead
@@ -426,7 +536,7 @@ export default function ProductCategoryCompany() {
 
                                                 {/* <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <img src={`https://swrielapp.onrender.com/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
+                                                        <img src={`http://localhost:8000/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
                                                     </Stack>
                                                 </TableCell> */}
                                                 <TableCell align="left">{_id}</TableCell>
@@ -436,7 +546,7 @@ export default function ProductCategoryCompany() {
                                                 <TableCell align="left">{productPrice} ₹</TableCell>
                                                 <TableCell align="left">{productTitle}</TableCell>
                                                 {/* <TableCell align="left">{productDescription}</TableCell> */}
-                                                <TableCell align="left">{productCompany}</TableCell>
+                                                <TableCell align="left">{productCompany?.companyName}</TableCell>
                                                 <TableCell align="left">{productSubcategory.productData.productName}</TableCell>
                                                 <TableCell align="left">{createdAt}</TableCell>
                                                 {/* <TableCell align="left">{email}</TableCell>
@@ -447,10 +557,10 @@ export default function ProductCategoryCompany() {
                         <TableCell align="left">{state}</TableCell> */}
 
                                                 <TableCell align="left">
-                                                    {/* <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteFunc(_id)}>
-                                                        <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-                                                        Delete
-                                                    </MenuItem> */}
+                                                    <MenuItem sx={{ color: 'success.main' }} onClick={() => onOpenModal3(_id)}>
+
+                                                        Update Price
+                                                    </MenuItem>
                                                 </TableCell>
 
                                             </TableRow>

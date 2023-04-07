@@ -129,7 +129,7 @@ export default function BlogPage() {
   const fetchUser = async () => {
     try {
       setLoading(true)
-      const res = await axios.get('https://swrielapp.onrender.com/admin/allproducts');
+      const res = await axios.get('http://localhost:8000/admin/allproducts');
       console.log(res, 'res');
       setLoading(false)
       if (res.data.status === 400) {
@@ -146,7 +146,7 @@ export default function BlogPage() {
   const deleteFunc = async (id) => {
     try {
       setLoading(true)
-      const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteproduct/${id}`);
+      const res = await axios.delete(`http://localhost:8000/admin/deleteproduct/${id}`);
       console.log(res, 'res');
       setLoading(false)
       if (res.data.status === 400) {
@@ -200,7 +200,7 @@ export default function BlogPage() {
       };
       console.log(dataobj, 'data obj');
       setLoading(true)
-      const res = await axios.post('https://swrielapp.onrender.com/admin/addproduct', dataobj);
+      const res = await axios.post('http://localhost:8000/admin/addproduct', dataobj);
       console.log(res, 'res');
       setLoading(false)
       if (res.data.status === 400) {
