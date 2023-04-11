@@ -11,6 +11,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { useNavigate } from 'react-router-dom';
 import { ref, uploadBytes, getdownloadURl } from 'firebase/storage';
 import firebase from 'firebase';
+import { MultiSelect } from "react-multi-select-component";
 // @mui
 import {
   Card,
@@ -94,19 +95,26 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function BlogPage() {
+
+  const options = [
+    { label: "Grapes 🍇", value: "grapes" },
+    { label: "Mango 🥭", value: "mango" },
+    { label: "Strawberry 🍓", value: "strawberry", disabled: true },
+  ];
+  const [selected, setSelected] = useState([]);
   const [open, setOpen] = useState(null);
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState('asc');
 
-  const [selected, setSelected] = useState([]);
+
   const [USERLIST, setUserList] = useState([]);
 
   const [orderBy, setOrderBy] = useState('name');
 
   const [filterName, setFilterName] = useState('');
-  const [currentUserId, setCurrentUserId] = useState('');
+  const [company, setCompany] = useState([]);
   const [selectedFile, setselectedFile] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open2, setOpen2] = useState(false);
@@ -118,6 +126,7 @@ export default function BlogPage() {
 
   useEffect(() => {
     fetchUser();
+    fetchCompany()
     _getasync()
   }, []);
   const _getasync = async () => {
@@ -126,6 +135,30 @@ export default function BlogPage() {
       navigate('/login', { replace: false });
     }
   };
+
+  const fetchCompany = async () => {
+    try {
+      setLoading(true)
+      const res = await axios.get('https://swrielapp.onrender.com/admin/allcompany');
+      console.log(res, 'res');
+      setLoading(false)
+      if (res.data.status === 400) {
+        alert(res.data.message);
+      } else {
+        const array = []
+        res.data.result.map((item, index) => {
+          return array.push({ "label": item.companyName, "value": item._id })
+        })
+        // console.log(array, 'jkjk')
+        setCompany(array)
+      }
+    } catch (error) {
+      setLoading(false)
+      console.log(error, 'error');
+    }
+  };
+
+
   const fetchUser = async () => {
     try {
       setLoading(true)
@@ -193,10 +226,20 @@ export default function BlogPage() {
   };
 
   const uploadService = async () => {
+    const companies = []
+    if (selected.length > 0) {
+      selected.map((item, index) => {
+        return companies.push(item.value)
+      })
+      console.log(companies)
+    } else {
+      alert("Please Select Company")
+    }
     try {
       const dataobj = {
         productName,
         productImage: imagePath,
+        companies
       };
       console.log(dataobj, 'data obj');
       setLoading(true)
@@ -316,6 +359,14 @@ export default function BlogPage() {
                   Add Product
                 </Typography>
                 <TextField name="Service" label="Products Name" onChange={(event) => setProduct(event.target.value)} />
+
+                <MultiSelect
+                  options={company}
+                  value={selected}
+                  onChange={setSelected}
+                  labelledBy="Select Companies"
+                />
+
                 <Input onChange={onFileChange} type="file" hidden />
                 <Button variant="contained" component="label" onClick={onFileUpload}>
                   Upload File
