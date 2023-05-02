@@ -50,12 +50,8 @@ const TABLE_HEAD = [
     { id: 'productName', label: 'Product', alignRight: false },
     { id: 'createdAt', label: 'CreatedAt', alignRight: false },
     { id: 'editdelete', label: 'Delete', alignRight: false },
+    { id: 'editdelete', label: 'Edit', alignRight: false },
 
-    // { id: 'email', label: 'Email', alignRight: false },
-    // { id: 'phone', label: 'Phone', alignRight: false },
-    // { id: 'address', label: 'Address', alignRight: false },
-    // { id: 'city', label: 'City', alignRight: false },
-    // { id: 'state', label: 'State', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -101,18 +97,20 @@ export default function ProductCategory() {
     const [productList, setProductList] = useState([]);
 
     const [orderBy, setOrderBy] = useState('name');
-    const [company, setCompany] = useState([]);
+
     const [filterName, setFilterName] = useState('');
     const [companyId, setCompanyId] = useState('');
-    const [selectedFile, setselectedFile] = useState(null);
+
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [open2, setOpen2] = useState(false);
-    const [isImgUploaded, setIsImageUploaded] = useState(true);
-    const [imagePath, setImagePath] = useState('');
+
     const [productCategoryName, setProductCategory] = useState('');
+    const [productCategoryName2, setProductCategory2] = useState('');
+    const [_id, setId] = useState('');
     const [productId, setProductId] = useState('');
     const onOpenModal = () => setOpen2(true);
     const onCloseModal = () => setOpen2(false);
+    const onCloseModal2 = () => setOpen(false);
 
     useEffect(() => {
         fetchUser();
@@ -206,14 +204,36 @@ export default function ProductCategory() {
         }
     };
 
+    const editFunction = async () => {
+        try {
+            const dataobj = {
+                categoryName: productCategoryName2,
+                _id,
 
-    const handleOpenMenu = (event) => {
-        setOpen(event.currentTarget);
+            };
+            setLoading(true);
+            console.log(dataobj, 'data obj');
+            const res = await axios.patch('http://localhost:8000/admin/product/editcategory', dataobj);
+            setLoading(false);
+            console.log(res, 'resaddcategory');
+            if (res.data.status === 400) {
+                alert(res.data.message);
+            }
+            if (res.data.status === 200) {
+                setProductCategory2('');
+                setId("")
+
+                setOpen(false);
+                fetchUser();
+                alert(res.data.result.message);
+            }
+        } catch (error) {
+            setLoading(false);
+            console.log(error);
+            alert('something went wrong');
+        }
     };
 
-    const handleCloseMenu = () => {
-        setOpen(null);
-    };
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -259,20 +279,25 @@ export default function ProductCategory() {
         setFilterName(event.target.value);
     };
 
+
+    const editmodalfunc = (item) => {
+        setOpen(true);
+
+        setProductCategory2(item?.categoryName)
+        setId(item?._id)
+
+    }
     const Userlist = [];
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
     const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
 
     const isNotFound = !filteredUsers.length && !!filterName;
-    const onFileChange = (event) => {
-        // Update the state
-        setselectedFile(event.target.files[0]);
-    };
+
     return (
         <>
             <Helmet>
-                <title> User | Minimal UI </title>
+                <title> SWRIEL ADMIN</title>
             </Helmet>
 
             <Container>
@@ -343,6 +368,50 @@ export default function ProductCategory() {
                                 Add
                             </LoadingButton>}
                         </Modal>
+                        <Modal open={open} onClose={onCloseModal2} center>
+                            <Stack spacing={3}>
+                                <Typography variant="h3" gutterBottom>
+                                    Edit Product/Category
+                                </Typography>
+                                <TextField name="Service"
+                                    label="Category Name"
+                                    onChange={(event) => setProductCategory2(event.target.value)}
+                                    value={productCategoryName2}
+                                />
+                                {/* <Typography variant="h6" gutterBottom>
+                                    Select Service
+                                </Typography>
+                                <select name="category" id="category" style={{ height: 40, borderRadius: 5 }}
+                                    onChange={(e) => setProductId(e.target.value)}
+
+                                >
+                                    <option value=" ">Choose</option>
+                                    {productList.map((item, index) => {
+                                        return <option value={item._id}>{item.productName}</option>
+                                    })}
+                                </select> */}
+
+                            </Stack>
+
+
+                            {loading ? <ClipLoader
+                                color={'blue'}
+                                loading={loading}
+
+                                size={30}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            /> : <LoadingButton
+                                fullWidth
+                                size="large"
+                                type="submit"
+                                variant="contained"
+
+                                onClick={editFunction}
+                            >
+                                Update
+                            </LoadingButton>}
+                        </Modal>
                         <TableContainer sx={{ minWidth: 800 }}>
                             <Table>
                                 <UserListHead
@@ -385,6 +454,12 @@ export default function ProductCategory() {
                                                     <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteFunc(_id)}>
                                                         <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
                                                         Delete
+                                                    </MenuItem>
+                                                </TableCell>
+                                                <TableCell align="left">
+                                                    <MenuItem onClick={() => editmodalfunc(row)}>
+                                                        <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+                                                        Edit
                                                     </MenuItem>
                                                 </TableCell>
 
@@ -437,34 +512,7 @@ export default function ProductCategory() {
                 </Card>
             </Container>
 
-            <Popover
-                open={Boolean(open)}
-                anchorEl={open}
-                onClose={handleCloseMenu}
-                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                PaperProps={{
-                    sx: {
-                        p: 1,
-                        width: 140,
-                        '& .MuiMenuItem-root': {
-                            px: 1,
-                            typography: 'body2',
-                            borderRadius: 0.75,
-                        },
-                    },
-                }}
-            >
-                <MenuItem>
-                    <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-                    View
-                </MenuItem>
 
-                <MenuItem sx={{ color: 'error.main' }} onClick={() => alert('hhihih')}>
-                    <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-                    Delete
-                </MenuItem>
-            </Popover>
         </>
     );
 }

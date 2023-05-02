@@ -51,7 +51,7 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 const TABLE_HEAD = [
     { id: 'promoImg', label: 'Promo Img', alignRight: false },
     { id: 'promoname', label: 'Promotion', alignRight: false },
-    { id: 'percentoff', label: 'Percent Off', alignRight: false },
+    { id: 'amountOff', label: 'Amount Off', alignRight: false },
     { id: 'promocode', label: 'Promocode', alignRight: false },
     { id: 'validtill', label: 'Valid Till', alignRight: false },
     { id: 'promodescription', label: 'Description', alignRight: false },

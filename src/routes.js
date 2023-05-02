@@ -28,6 +28,7 @@ import AppBanner from './pages/AppBanner';
 import AllBanksDetails from './pages/AllBanksDetails';
 import Offers from './pages/Offers';
 import Companies from './pages/Companies';
+import SendNotification from './pages/SendNotification';
 
 
 // ----------------------------------------------------------------------
@@ -66,6 +67,7 @@ export default function Router() {
         { path: 'appbanners', element: <AppBanner /> },
         { path: 'allbanksdetails', element: <AllBanksDetails /> },
         { path: 'offers', element: <Offers /> },
+        { path: 'sendnotification', element: <SendNotification /> },
       ],
     },
 

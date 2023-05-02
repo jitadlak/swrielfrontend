@@ -51,12 +51,9 @@ const TABLE_HEAD = [
     { id: 'description', label: 'Description', alignRight: false },
     { id: 'createdAt', label: 'CreatedAt', alignRight: false },
     { id: 'editdelete', label: 'Delete', alignRight: false },
+    { id: 'editdelete', label: 'Edit', alignRight: false },
 
-    // { id: 'email', label: 'Email', alignRight: false },
-    // { id: 'phone', label: 'Phone', alignRight: false },
-    // { id: 'address', label: 'Address', alignRight: false },
-    // { id: 'city', label: 'City', alignRight: false },
-    // { id: 'state', label: 'State', alignRight: false },
+
 ];
 
 // ----------------------------------------------------------------------
@@ -91,7 +88,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function ServiceSubCategory() {
-    const [open, setOpen] = useState(null);
+
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
 
@@ -104,18 +101,21 @@ export default function ServiceSubCategory() {
     const [orderBy, setOrderBy] = useState('name');
     const navigate = useNavigate();
     const [filterName, setFilterName] = useState('');
-    const [currentUserId, setCurrentUserId] = useState('');
-    const [selectedFile, setselectedFile] = useState(null);
+
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [open2, setOpen2] = useState(false);
-    const [isImgUploaded, setIsImageUploaded] = useState(true);
-    const [imagePath, setImagePath] = useState('');
+    const [open, setOpen] = useState(false);
     const [servicesubCategoryName, setServicesubCategory] = useState('');
     const [categoryId, setCategoryId] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
+    const [price2, setPrice2] = useState('');
+    const [_id, setId] = useState('');
+    const [description2, setDescription2] = useState('');
+    const [servicesubCategoryName2, setServicesubCategory2] = useState('');
     const onOpenModal = () => setOpen2(true);
     const onCloseModal = () => setOpen2(false);
+    const onCloseModal2 = () => setOpen(false);
 
     useEffect(() => {
         fetchUser();
@@ -210,9 +210,38 @@ export default function ServiceSubCategory() {
         }
     };
 
-    const handleOpenMenu = (event) => {
-        setOpen(event.currentTarget);
+    const editFunction = async () => {
+        try {
+            const dataobj = {
+                subcatagoryname: servicesubCategoryName2,
+                _id,
+                price: price2,
+                description: description2,
+            };
+            setLoading(true);
+            console.log(dataobj, 'data obj');
+            const res = await axios.patch('https://swrielapp.onrender.com/admin/services/editsubcategory', dataobj);
+            setLoading(false);
+            console.log(res, 'resaddcategory');
+            if (res.data.status === 400) {
+                alert(res.data.message);
+            }
+            if (res.data.status === 200) {
+                setServicesubCategory2('');
+                setId("")
+                setPrice2('');
+                setDescription2('');
+                setOpen(false);
+                fetchUser();
+                alert(res.data.result.message);
+            }
+        } catch (error) {
+            setLoading(false);
+            console.log(error);
+            alert('something went wrong');
+        }
     };
+
 
     const handleCloseMenu = () => {
         setOpen(null);
@@ -262,20 +291,25 @@ export default function ServiceSubCategory() {
         setFilterName(event.target.value);
     };
 
-    const Userlist = [];
+    const editmodalfunc = (item) => {
+        setOpen(true);
+        setPrice2(item?.price)
+        setServicesubCategory2(item?.subcatagoryname);
+        setDescription2(item?.description)
+        setId(item?._id)
+
+    }
+
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
     const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
 
     const isNotFound = !filteredUsers.length && !!filterName;
-    const onFileChange = (event) => {
-        // Update the state
-        setselectedFile(event.target.files[0]);
-    };
+
     return (
         <>
             <Helmet>
-                <title> User | Minimal UI </title>
+                <title>  SWRIEL ADMIN</title>
             </Helmet>
 
             <Container>
@@ -347,6 +381,46 @@ export default function ServiceSubCategory() {
                                 </LoadingButton>
                             )}
                         </Modal>
+
+                        <Modal open={open} onClose={onCloseModal2} center>
+                            <Stack spacing={3}>
+                                <Typography variant="h3" gutterBottom>
+                                    Edit Service/Sub Category
+                                </Typography>
+                                <TextField
+                                    name="Service"
+                                    label="Sub Category Name"
+                                    value={servicesubCategoryName2}
+                                    onChange={(event) => setServicesubCategory2(event.target.value)}
+                                />
+                                <TextField name="Service"
+                                    label="Price"
+                                    value={price2}
+                                    onChange={(event) => setPrice2(event.target.value)} />
+                                <TextField
+                                    name="Service"
+                                    label="Description"
+                                    value={description2}
+                                    onChange={(event) => setDescription2(event.target.value)}
+                                />
+
+                            </Stack>
+                            {loading ? (
+                                <ClipLoader
+                                    color={'blue'}
+                                    loading={loading}
+                                    size={30}
+                                    aria-label="Loading Spinner"
+                                    data-testid="loader"
+                                />
+                            ) : (
+                                <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={editFunction}>
+                                    Update
+                                </LoadingButton>
+                            )}
+                        </Modal>
+
+
                         <TableContainer sx={{ minWidth: 800 }}>
                             <Table>
                                 <UserListHead
@@ -391,6 +465,12 @@ export default function ServiceSubCategory() {
                                                     <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteFunc(_id)}>
                                                         <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
                                                         Delete
+                                                    </MenuItem>
+                                                </TableCell>
+                                                <TableCell align="left">
+                                                    <MenuItem onClick={() => editmodalfunc(row)}>
+                                                        <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+                                                        Edit
                                                     </MenuItem>
                                                 </TableCell>
                                             </TableRow>
@@ -442,7 +522,7 @@ export default function ServiceSubCategory() {
                 </Card>
             </Container>
 
-            <Popover
+            {/* <Popover
                 open={Boolean(open)}
                 anchorEl={open}
                 onClose={handleCloseMenu}
@@ -469,7 +549,7 @@ export default function ServiceSubCategory() {
                     <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
                     Delete
                 </MenuItem>
-            </Popover>
+            </Popover> */}
         </>
     );
 }

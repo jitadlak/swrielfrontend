@@ -106,6 +106,11 @@ const navConfig = [
     path: '/dashboard/appbanners',
     icon: icon('ic_lock'),
   },
+  {
+    title: 'SEND NOTIFICATIONS',
+    path: '/dashboard/sendnotification',
+    icon: icon('ic_blog'),
+  },
 
 
   // {

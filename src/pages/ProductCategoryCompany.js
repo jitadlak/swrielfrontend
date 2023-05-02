@@ -58,12 +58,7 @@ const TABLE_HEAD = [
     { id: 'productSubcategory', label: 'Category', alignRight: false },
     { id: 'createdAt', label: 'createdAt', alignRight: false },
     { id: 'update', label: 'Update Price', alignRight: false },
-
-
-    // { id: 'phone', label: 'Phone', alignRight: false },
-    // { id: 'address', label: 'Address', alignRight: false },
-    // { id: 'city', label: 'City', alignRight: false },
-    // { id: 'state', label: 'State', alignRight: false },
+    { id: 'edit', label: 'Edit', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -560,6 +555,12 @@ export default function ProductCategoryCompany() {
                                                     <MenuItem sx={{ color: 'success.main' }} onClick={() => onOpenModal3(_id)}>
 
                                                         Update Price
+                                                    </MenuItem>
+                                                </TableCell>
+                                                <TableCell align="left">
+                                                    <MenuItem>
+                                                        <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+                                                        Edit
                                                     </MenuItem>
                                                 </TableCell>
 
