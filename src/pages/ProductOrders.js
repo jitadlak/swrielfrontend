@@ -51,6 +51,7 @@ const TABLE_HEAD = [
     { id: 'products', label: 'Product Booked', alignRight: false },
     { id: 'totalquantity', label: 'Total Quantity', alignRight: false },
     { id: 'totalamount', label: 'Total Amount', alignRight: false },
+    { id: 'paymentstatus', label: 'Payment Status', alignRight: false },
     { id: 'deliveryfee', label: 'Delivery Fee', alignRight: false },
     { id: 'address', label: 'Address', alignRight: false },
     { id: 'city', label: 'City', alignRight: false },
@@ -269,6 +270,7 @@ export default function ProductOrders() {
                                                 </TableCell>
                                                 <TableCell align="left">{TotalQuantity}</TableCell>
                                                 <TableCell align="left">{TotalAmount} ₹</TableCell>
+                                                <TableCell align="left">{paymentId === 0 ? "Pending/Failed" : "Success"} </TableCell>
                                                 <TableCell align="left">{DeliveryFee} ₹</TableCell>
                                                 <TableCell align="left">{addressLine1}</TableCell>
                                                 <TableCell align="left">{city}</TableCell>

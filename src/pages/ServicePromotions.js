@@ -8,6 +8,9 @@ import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 import ClipLoader from "react-spinners/ClipLoader";
 import { useNavigate } from 'react-router-dom';
+import { ref, uploadBytes, getdownloadURl } from 'firebase/storage';
+import firebase from 'firebase';
+
 // @mui
 import {
     Card,
@@ -37,6 +40,7 @@ import { LoadingButton } from '@mui/lab';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
+import storage from '../urls/firebase';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 
@@ -45,13 +49,19 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-    { id: 'productcategoryid', label: 'Product Category ID', alignRight: false },
-    { id: 'categoryName', label: 'Product Category', alignRight: false },
-    { id: 'productName', label: 'Product', alignRight: false },
-    { id: 'createdAt', label: 'CreatedAt', alignRight: false },
+    { id: 'promoImg', label: 'Promo Img', alignRight: false },
+    { id: 'promoname', label: 'Promotion', alignRight: false },
+    { id: 'amountOff', label: 'Amount Off', alignRight: false },
+    { id: 'promocode', label: 'Promocode', alignRight: false },
+    { id: 'validtill', label: 'Valid Till', alignRight: false },
+    { id: 'promodescription', label: 'Description', alignRight: false },
+    { id: 'time', label: 'CreatedAt', alignRight: false },
     { id: 'editdelete', label: 'Delete', alignRight: false },
-    { id: 'editdelete', label: 'Edit', alignRight: false },
-
+    // { id: 'email', label: 'Email', alignRight: false },
+    // { id: 'phone', label: 'Phone', alignRight: false },
+    // { id: 'address', label: 'Address', alignRight: false },
+    // { id: 'city', label: 'City', alignRight: false },
+    // { id: 'state', label: 'State', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -80,12 +90,12 @@ function applySortFilter(array, comparator, query) {
         return a[1] - b[1];
     });
     if (query) {
-        return filter(array, (_user) => _user.categoryName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        return filter(array, (_user) => _user.promoname.toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
 }
 
-export default function ProductCategory() {
+export default function ServicePromotions() {
     const [open, setOpen] = useState(null);
     const navigate = useNavigate();
     const [page, setPage] = useState(0);
@@ -99,24 +109,27 @@ export default function ProductCategory() {
     const [orderBy, setOrderBy] = useState('name');
 
     const [filterName, setFilterName] = useState('');
-    const [companyId, setCompanyId] = useState('');
-
+    const [currentUserId, setCurrentUserId] = useState('');
+    const [selectedFile, setselectedFile] = useState(null);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [open2, setOpen2] = useState(false);
+    const [isImgUploaded, setIsImageUploaded] = useState(true);
+    const [imagePath, setImagePath] = useState('');
 
-    const [productCategoryName, setProductCategory] = useState('');
-    const [productCategoryName2, setProductCategory2] = useState('');
-    const [_id, setId] = useState('');
+    const [promoname, setPromoName] = useState('');
+    const [percentoff, setPercentOff] = useState('');
+    const [promocode, setPromocode] = useState('');
+    const [validtill, setValid] = useState('');
+    const [promodescription, setPromoDescription] = useState('');
+    const [promoImg, setPromoImg] = useState('');
+
     const [productId, setProductId] = useState('');
     const onOpenModal = () => setOpen2(true);
     const onCloseModal = () => setOpen2(false);
-    const onCloseModal2 = () => setOpen(false);
 
     useEffect(() => {
         fetchUser();
-        fetchUser2();
-
-        _getasync()
+        _getasync();
     }, []);
     const _getasync = async () => {
         const items = await localStorage.getItem('user_login');
@@ -127,7 +140,7 @@ export default function ProductCategory() {
     const fetchUser = async () => {
         try {
             setLoading(true)
-            const res = await axios.get('https://swrielapp.onrender.com/admin/allproductcategory');
+            const res = await axios.get('https://swrielapp.onrender.com/admin/allservicespromos');
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -141,24 +154,24 @@ export default function ProductCategory() {
         }
     };
 
-    const fetchUser2 = async () => {
-        try {
-            const res = await axios.get('https://swrielapp.onrender.com/admin/allproducts');
-            console.log(res, 'res');
-            if (res.data.status === 400) {
-                alert(res.data.message);
-            } else {
-                setProductList(res.data.result);
-            }
-        } catch (error) {
-            console.log(error, 'error');
-        }
-    };
+    // const fetchUser2 = async () => {
+    //     try {
+    //         const res = await axios.get('https://swrielapp.onrender.com/admin/allproducts');
+    //         console.log(res, 'res');
+    //         if (res.data.status === 400) {
+    //             alert(res.data.message);
+    //         } else {
+    //             setProductList(res.data.result);
+    //         }
+    //     } catch (error) {
+    //         console.log(error, 'error');
+    //     }
+    // };
 
     const deleteFunc = async (id) => {
         try {
             setLoading(true)
-            const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteproductcategory/${id}`);
+            const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteservicespromotion/${id}`);
             console.log(res, 'res');
             setLoading(false)
             if (res.data.status === 400) {
@@ -172,18 +185,83 @@ export default function ProductCategory() {
         }
     };
 
+    const onFileUpload = async () => {
 
+        setLoading(true)
+        const storageRef = firebase.storage().ref(`images/${selectedFile.name}`);
+        const uploadTask = storageRef.put(selectedFile);
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log(`Upload is ${progress}% done`);
+            },
+            (error) => {
+                setLoading(false)
+                // Handle unsuccessful uploads
+                alert(error);
+            },
+            () => {
+                // Handle successful uploads on complete
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    console.log('File available at', downloadURL);
+                    alert("Image Uploaded")
+                    setLoading(false)
+                    setIsImageUploaded(false);
+                    setPromoImg(downloadURL)
+                    // console.lo(downloadURL);
+                });
+            }
+        );
+
+
+
+
+        // storage.ref(`/images/${selectedFile.name}`).put(selectedFile)
+        //     .on("state_changed", alert("success"), alert).getDownloadURL().then((downloadURL) => {
+        //         console.log(`File available at ${downloadURL}`);
+        //     });;
+        // const storageRef = ref(storage, `/images/${selectedFile.name}`);
+        // uploadBytes(storageRef, file).then((snapshot) => {
+        //     console.log('uploaded');
+        //     getDownloadURL(snapshot.ref).then(url => console.log(url));
+        // });
+        // Create an object of formData
+        // const formData = new FormData();
+
+        // // Update the formData object
+        // formData.append('image', selectedFile, selectedFile.name);
+
+        // // Details of the uploaded file
+        // console.log(selectedFile);
+
+        // // Request made to the backend api
+        // // Send formData object
+        // setLoading(true)
+        // const res = await axios.post('https://swrielapp.onrender.com/imageupload', formData);
+        // console.log(res, 'res');
+        // setLoading(false)
+        // setIsImageUploaded(false);
+        // if (res.data.path) {
+        //     setPromoImg(res.data.path);
+        //     alert("image uploaded")
+        // }
+    };
 
     const uploadService = async () => {
         try {
             const dataobj = {
-                categoryName: productCategoryName,
-                productId,
-                companyId
+                promoname,
+                percentoff,
+                promocode,
+                validtill,
+                promodescription,
+                promoImg
             };
-            console.log(dataobj, 'data obj');
             setLoading(true)
-            const res = await axios.post('https://swrielapp.onrender.com/admin/addproductcategory', dataobj,);
+            console.log(dataobj, 'data obj');
+            const res = await axios.post('https://swrielapp.onrender.com/admin/addservicespromos', dataobj,);
             console.log(res, 'resaddcategory');
             setLoading(false)
             if (res.data.status === 400) {
@@ -191,49 +269,26 @@ export default function ProductCategory() {
             }
             if (res.data.status === 200) {
 
-                setProductCategory('');
-                setProductId('')
+
+
                 setOpen2(false);
                 fetchUser()
                 alert("Product Added Successfully")
             }
         } catch (error) {
-            console.log(error);
             setLoading(false)
+            console.log(error);
             alert("something went wrong")
         }
     };
 
-    const editFunction = async () => {
-        try {
-            const dataobj = {
-                categoryName: productCategoryName2,
-                _id,
-
-            };
-            setLoading(true);
-            console.log(dataobj, 'data obj');
-            const res = await axios.patch('https://swrielapp.onrender.com/admin/product/editcategory', dataobj);
-            setLoading(false);
-            console.log(res, 'resaddcategory');
-            if (res.data.status === 400) {
-                alert(res.data.message);
-            }
-            if (res.data.status === 200) {
-                setProductCategory2('');
-                setId("")
-
-                setOpen(false);
-                fetchUser();
-                alert(res.data.result.message);
-            }
-        } catch (error) {
-            setLoading(false);
-            console.log(error);
-            alert('something went wrong');
-        }
+    const handleOpenMenu = (event) => {
+        setOpen(event.currentTarget);
     };
 
+    const handleCloseMenu = () => {
+        setOpen(null);
+    };
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -279,34 +334,29 @@ export default function ProductCategory() {
         setFilterName(event.target.value);
     };
 
-
-    const editmodalfunc = (item) => {
-        setOpen(true);
-
-        setProductCategory2(item?.categoryName)
-        setId(item?._id)
-
-    }
     const Userlist = [];
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
     const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
 
     const isNotFound = !filteredUsers.length && !!filterName;
-
+    const onFileChange = (event) => {
+        // Update the state
+        setselectedFile(event.target.files[0]);
+    };
     return (
         <>
             <Helmet>
-                <title> SWRIEL ADMIN</title>
+                <title> User | Minimal UI </title>
             </Helmet>
 
             <Container>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
-                        Product/Category Lists
+                        Services Promotions
                     </Typography>
                     <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
-                        Add Category
+                        Add Promotions
                     </Button>
                 </Stack>
 
@@ -325,22 +375,27 @@ export default function ProductCategory() {
                         <Modal open={open2} onClose={onCloseModal} center>
                             <Stack spacing={3}>
                                 <Typography variant="h3" gutterBottom>
-                                    Add Product/Category
+                                    Add Promotions
                                 </Typography>
-                                <TextField name="Service" label="Category Name" onChange={(event) => setProductCategory(event.target.value)} />
+                                <TextField name="promoname" label="Promotion Name" onChange={(event) => setPromoName(event.target.value)} />
+                                <TextField name="percenoff" label="Amount Off" onChange={(event) => setPercentOff(event.target.value)} />
+                                <TextField name="promocode" label="Promo Code" onChange={(event) => setPromocode(event.target.value)} />
+                                <TextField name="validtill" label="Valid Till" onChange={(event) => setValid(event.target.value)} />
+                                <TextField name="promodescription" label="Description" onChange={(event) => setPromoDescription(event.target.value)} />
                                 <Typography variant="h6" gutterBottom>
-                                    Select Service
+                                    Select Promo Image
                                 </Typography>
-                                <select name="category" id="category" style={{ height: 40, borderRadius: 5 }}
-                                    onChange={(e) => setProductId(e.target.value)}
+                                <Input onChange={onFileChange} type="file" hidden />
+                                {loading ? <ClipLoader
+                                    color={'blue'}
+                                    loading={loading}
 
-                                >
-                                    <option value=" ">Choose</option>
-                                    {productList.map((item, index) => {
-                                        return <option value={item._id}>{item.productName}</option>
-                                    })}
-                                </select>
-
+                                    size={30}
+                                    aria-label="Loading Spinner"
+                                    data-testid="loader"
+                                /> : <Button variant="contained" component="label" onClick={onFileUpload}>
+                                    Upload File
+                                </Button>}
                             </Stack>
 
                             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
@@ -362,54 +417,10 @@ export default function ProductCategory() {
                                 size="large"
                                 type="submit"
                                 variant="contained"
-
+                                disabled={isImgUploaded}
                                 onClick={uploadService}
                             >
                                 Add
-                            </LoadingButton>}
-                        </Modal>
-                        <Modal open={open} onClose={onCloseModal2} center>
-                            <Stack spacing={3}>
-                                <Typography variant="h3" gutterBottom>
-                                    Edit Product/Category
-                                </Typography>
-                                <TextField name="Service"
-                                    label="Category Name"
-                                    onChange={(event) => setProductCategory2(event.target.value)}
-                                    value={productCategoryName2}
-                                />
-                                {/* <Typography variant="h6" gutterBottom>
-                                    Select Service
-                                </Typography>
-                                <select name="category" id="category" style={{ height: 40, borderRadius: 5 }}
-                                    onChange={(e) => setProductId(e.target.value)}
-
-                                >
-                                    <option value=" ">Choose</option>
-                                    {productList.map((item, index) => {
-                                        return <option value={item._id}>{item.productName}</option>
-                                    })}
-                                </select> */}
-
-                            </Stack>
-
-
-                            {loading ? <ClipLoader
-                                color={'blue'}
-                                loading={loading}
-
-                                size={30}
-                                aria-label="Loading Spinner"
-                                data-testid="loader"
-                            /> : <LoadingButton
-                                fullWidth
-                                size="large"
-                                type="submit"
-                                variant="contained"
-
-                                onClick={editFunction}
-                            >
-                                Update
                             </LoadingButton>}
                         </Modal>
                         <TableContainer sx={{ minWidth: 800 }}>
@@ -425,24 +436,27 @@ export default function ProductCategory() {
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const { _id, categoryName, productId, createdAt, productData } = row;
-                                        const selectedUser = selected.indexOf(categoryName) !== -1;
+                                        const { _id, promoname, percentoff, promocode, validtill, promodescription, serviceId, promoImg, users, time } = row;
+                                        const selectedUser = selected.indexOf(promoname) !== -1;
 
                                         return (
                                             <TableRow hover key={_id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                                                 <TableCell padding="checkbox">
-                                                    {/* <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, categoryName)} /> */}
+                                                    <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, promoname)} />
                                                 </TableCell>
 
-                                                {/* <TableCell component="th" scope="row" padding="none">
+                                                <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <img src={`https://swrielapp.onrender.com/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
+                                                        <img src={promoImg} alt={promoname} style={{ height: 80, width: 80, alignSelf: 'center', margin: 10 }} />
                                                     </Stack>
-                                                </TableCell> */}
-                                                <TableCell align="left">{_id}</TableCell>
-                                                <TableCell align="left">{categoryName}</TableCell>
-                                                <TableCell align="left">{productData?.productName}</TableCell>
-                                                <TableCell align="left">{createdAt}</TableCell>
+                                                </TableCell>
+
+                                                <TableCell align="left">{promoname}</TableCell>
+                                                <TableCell align="left">{percentoff}</TableCell>
+                                                <TableCell align="left">{promocode}</TableCell>
+                                                <TableCell align="left">{validtill}</TableCell>
+                                                <TableCell align="left">{promodescription}</TableCell>
+                                                <TableCell align="left">{time}</TableCell>
                                                 {/* <TableCell align="left">{email}</TableCell>
 
                         <TableCell align="left">{phone}</TableCell>
@@ -454,12 +468,6 @@ export default function ProductCategory() {
                                                     <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteFunc(_id)}>
                                                         <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
                                                         Delete
-                                                    </MenuItem>
-                                                </TableCell>
-                                                <TableCell align="left">
-                                                    <MenuItem onClick={() => editmodalfunc(row)}>
-                                                        <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-                                                        Edit
                                                     </MenuItem>
                                                 </TableCell>
 
@@ -512,7 +520,34 @@ export default function ProductCategory() {
                 </Card>
             </Container>
 
+            <Popover
+                open={Boolean(open)}
+                anchorEl={open}
+                onClose={handleCloseMenu}
+                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                PaperProps={{
+                    sx: {
+                        p: 1,
+                        width: 140,
+                        '& .MuiMenuItem-root': {
+                            px: 1,
+                            typography: 'body2',
+                            borderRadius: 0.75,
+                        },
+                    },
+                }}
+            >
+                <MenuItem>
+                    <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+                    View
+                </MenuItem>
 
+                <MenuItem sx={{ color: 'error.main' }} onClick={() => alert('hhihih')}>
+                    <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+                    Delete
+                </MenuItem>
+            </Popover>
         </>
     );
 }

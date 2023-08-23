@@ -79,13 +79,13 @@ export default function SendNotification() {
 
     const uploadService = async () => {
         try {
-            if (!id || !notificationTitle || !notificationData) {
+            if (!notificationTitle || !notificationData) {
                 alert("Please Fill All Fields !!")
             }
 
 
             const dataobj = {
-                id,
+
                 notificationTitle,
                 notificationData
 
@@ -113,13 +113,13 @@ export default function SendNotification() {
 
     const uploadServicevendor = async () => {
         try {
-            if (!id || !notificationTitle || !notificationData) {
+            if (!notificationTitle || !notificationData) {
                 alert("Please Fill All Fields !!")
             }
 
 
             const dataobj = {
-                id,
+
                 notificationTitle,
                 notificationData
 
@@ -164,7 +164,7 @@ export default function SendNotification() {
 
                 <Card style={{ padding: 10, height: 500 }} >
                     <div>
-                        <TextField name="Id" label="Id" onChange={(event) => setId(event.target.value)} />
+
                         <TextField name="title" label="Notification Title" onChange={(event) => setNotificationTitle(event.target.value)} />
                         <TextField name="message" label="Notification Data" onChange={(event) => setNotificationData(event.target.value)} />
 

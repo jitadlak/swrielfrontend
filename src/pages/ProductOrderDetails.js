@@ -39,7 +39,7 @@ export default function ProductOrderDetails() {
     const [vendorId, setVendorId] = useState('')
     const theme = useTheme();
     const { state } = useLocation();
-    // console.log(state, 'row');
+
 
 
 
@@ -123,6 +123,9 @@ export default function ProductOrderDetails() {
 
                             <Typography sx={{ mb: 1, ml: 3 }}>
                                 Amount : {state?.TotalAmount} ₹
+                            </Typography>
+                            <Typography sx={{ mb: 1, ml: 3 }}>
+                                Payment Status : {state?.paymentId === 0 ? "Pending/Failed" : "Success"}
                             </Typography>
                             <Typography sx={{ mb: 1, ml: 3 }}>
                                 DeliveryFee : {state?.DeliveryFee} ₹

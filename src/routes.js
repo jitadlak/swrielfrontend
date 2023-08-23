@@ -29,6 +29,7 @@ import AllBanksDetails from './pages/AllBanksDetails';
 import Offers from './pages/Offers';
 import Companies from './pages/Companies';
 import SendNotification from './pages/SendNotification';
+import ServicePromotions from './pages/ServicePromotions';
 
 
 // ----------------------------------------------------------------------
@@ -56,6 +57,7 @@ export default function Router() {
         { path: 'companies', element: <Companies /> },
         { path: 'productcategorycompany', element: <ProductCategoryCompany /> },
         { path: 'promotions', element: <Promotions /> },
+        { path: 'servicespromotions', element: <ServicePromotions /> },
         { path: 'serviceorders', element: <ServiceOrders /> },
         { path: 'serviceorderdetails', element: <ServiceOrderDetails /> },
         { path: 'productorders', element: <ProductOrders /> },

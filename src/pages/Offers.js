@@ -51,6 +51,7 @@ const TABLE_HEAD = [
     { id: 'offerimg', label: 'Offer Img', alignRight: false },
     { id: 'offertitle', label: 'Offer Title', alignRight: false },
     { id: 'offerdecription', label: 'Offer Description', alignRight: false },
+    { id: 'redirectTo', label: 'Redirect To', alignRight: false },
     { id: 'createdat', label: 'CreatedAt', alignRight: false },
     { id: 'editdelete', label: 'Delete', alignRight: false },
     // { id: 'email', label: 'Email', alignRight: false },
@@ -100,7 +101,7 @@ export default function Offers() {
 
     const [selected, setSelected] = useState([]);
     const [USERLIST, setUserList] = useState([]);
-    const [productList, setProductList] = useState([]);
+    const [redirectTo, setRedirectTo] = useState("");
 
     const [orderBy, setOrderBy] = useState('name');
 
@@ -213,6 +214,7 @@ export default function Offers() {
     const uploadService = async () => {
         try {
             const dataobj = {
+                redirectTo,
                 offertitle,
                 offerdetail,
                 offerimage: promoImg
@@ -337,7 +339,18 @@ export default function Offers() {
                                 </Typography>
                                 <TextField name="offertitle" label="Offer Title" onChange={(event) => setOfferTitle(event.target.value)} />
                                 <TextField name="offerdescription" label="Offer Description" onChange={(event) => setOfferDetails(event.target.value)} />
+                                <Typography variant="h6" gutterBottom>
+                                    Redirect To
+                                </Typography>
+                                <select name="category" id="category" style={{ height: 40, borderRadius: 5 }}
+                                    onChange={(e) => setRedirectTo(e.target.value)}
 
+                                >
+                                    <option value=" ">Choose</option>
+                                    <option value="Services">Services</option>
+                                    <option value="Product">Products</option>
+
+                                </select>
                                 <Typography variant="h6" gutterBottom>
                                     Select Offer Image
                                 </Typography>
@@ -392,7 +405,7 @@ export default function Offers() {
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const { _id, offertitle, offerdetail, offerimage, time } = row;
+                                        const { _id, offertitle, offerdetail, offerimage, time, redirectTo } = row;
                                         const selectedUser = selected.indexOf(offertitle) !== -1;
 
                                         return (
@@ -409,7 +422,7 @@ export default function Offers() {
 
                                                 <TableCell align="left">{offertitle}</TableCell>
                                                 <TableCell align="left">{offerdetail}</TableCell>
-                                                {/* <TableCell align="left">{promocode}</TableCell> */}
+                                                <TableCell align="left">{redirectTo}</TableCell>
 
                                                 <TableCell align="left">{time}</TableCell>
 

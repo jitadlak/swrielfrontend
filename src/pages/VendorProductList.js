@@ -4,6 +4,7 @@ import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import ClipLoader from "react-spinners/ClipLoader";
 import 'react-responsive-modal/styles.css';
 import { useLocation } from 'react-router-dom';
 import { Modal } from 'react-responsive-modal';
@@ -56,6 +57,7 @@ const TABLE_HEAD = [
     { id: 'createdAt', label: 'createdAt', alignRight: false },
     { id: 'sellingprice', label: 'Selling Price', alignRight: false },
     { id: 'mrp', label: 'MRP', alignRight: false },
+    { id: 'update', label: 'Update Price', alignRight: false },
 
     // { id: 'phone', label: 'Phone', alignRight: false },
     // { id: 'address', label: 'Address', alignRight: false },
@@ -98,7 +100,7 @@ export default function VendorProductList() {
 
     const { state } = useLocation();
     console.log(state._id, 'row');
-
+    const [newPrice, setNewPrice] = useState('');
     const [open, setOpen] = useState(null);
 
     const [page, setPage] = useState(0);
@@ -108,9 +110,9 @@ export default function VendorProductList() {
     const [selected, setSelected] = useState([]);
     const [USERLIST, setUserList] = useState([]);
     const [productList, setProductList] = useState([]);
-
+    const [updatedId, setupdateId] = useState('');
     const [orderBy, setOrderBy] = useState('name');
-
+    const [loading, setLoading] = useState(false);
     const [filterName, setFilterName] = useState('');
     const [currentUserId, setCurrentUserId] = useState('');
     const [selectedFile, setselectedFile] = useState(null);
@@ -120,9 +122,12 @@ export default function VendorProductList() {
     const [imagePath, setImagePath] = useState('');
     const [productCategoryName, setProductCategory] = useState('');
     const [productId, setProductId] = useState('');
-    const onOpenModal = () => setOpen2(true);
-    const onCloseModal = () => setOpen2(false);
 
+    const onCloseModal = () => setOpen2(false);
+    const onOpenModal3 = (_id) => {
+        setupdateId(_id)
+        setOpen2(true);
+    }
     useEffect(() => {
         fetchUser();
 
@@ -142,6 +147,34 @@ export default function VendorProductList() {
         }
     };
 
+    const updatePrice = async () => {
+        try {
+            const data = {
+                updatedId,
+                newPrice
+
+            }
+
+            // console.log(data, 'update balance api')
+            setLoading(true)
+            const res = await axios.patch('https://swrielapp.onrender.com/admin/updateprice', data);
+            console.log(res, 'res updated');
+            setLoading(false)
+            if (res.data.status === 400) {
+                alert(res.data?.message);
+
+            } else {
+                setOpen2(false);
+                fetchUser()
+                alert(res.data?.result?.message);
+
+
+            }
+        } catch (error) {
+            setLoading(false)
+            console.log(error, 'error');
+        }
+    };
 
 
 
@@ -226,6 +259,43 @@ export default function VendorProductList() {
                     <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
                     <Scrollbar>
+                        <Modal open={open2} onClose={onCloseModal}  >
+                            <Stack spacing={4}>
+                                <Typography variant="h3" gutterBottom>
+                                    Update Product Price
+                                </Typography>
+
+                                <TextField name="Product Price" label="Product Price" onChange={(event) => setNewPrice(event.target.value)} />
+
+                                {/* <TextField name="Product Company" label="Product Company" onChange={(event) => setProductCompany(event.target.value)} /> */}
+
+                            </Stack>
+
+                            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+                                {/* <Checkbox name="remember" label="Remember me" />
+        <Link variant="subtitle2" underline="hover">
+          Forgot password?
+        </Link> */}
+                            </Stack>
+                            {loading ? <ClipLoader
+                                color={'blue'}
+                                loading={loading}
+
+                                size={30}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            /> :
+                                <LoadingButton
+                                    fullWidth
+                                    size="large"
+                                    type="submit"
+                                    variant="contained"
+
+                                    onClick={updatePrice}
+                                >
+                                    Update
+                                </LoadingButton>}
+                        </Modal>
 
                         <TableContainer sx={{ minWidth: 800 }}>
                             <Table>
@@ -256,18 +326,25 @@ export default function VendorProductList() {
                                                 </TableCell> */}
                                                 <TableCell align="left">{_id}</TableCell>
 
-                                                <TableCell align="left">      <img src={`https://swrielapp.onrender.com/${productImage}`} alt={productImage} style={{ height: 100, width: 100, margin: 20, }} /></TableCell>
+                                                <TableCell align="left">
+                                                    <img src={productImage} alt={productImage} style={{ height: 100, width: 100, margin: 20, }} /></TableCell>
                                                 <TableCell align="left">{productName}</TableCell>
 
                                                 <TableCell align="left">{productPrice}</TableCell>
                                                 <TableCell align="left">{productTitle}</TableCell>
                                                 {/* <TableCell align="left">{productDescription}</TableCell> */}
-                                                <TableCell align="left">{productCompany}</TableCell>
-                                                <TableCell align="left">{productSubcategory.productData.productName}</TableCell>
+                                                <TableCell align="left">{productCompany?.companyName}</TableCell>
+                                                <TableCell align="left">{productSubcategory?.productData?.productName}</TableCell>
                                                 <TableCell align="left">{createdAt}</TableCell>
                                                 <TableCell align="left">{sellingprice}</TableCell>
 
                                                 <TableCell align="left">{mrp}</TableCell>
+                                                <TableCell align="left">
+                                                    <MenuItem onClick={() => onOpenModal3(_id)}>
+                                                        <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+                                                        Update Product Price
+                                                    </MenuItem>
+                                                </TableCell>
                                                 {/* <TableCell align="left">{address}</TableCell>
                         <TableCell align="left">{city}</TableCell>
                         <TableCell align="left">{state}</TableCell>  */}

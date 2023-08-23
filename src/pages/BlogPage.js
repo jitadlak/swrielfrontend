@@ -1,5 +1,3 @@
-
-
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
@@ -7,11 +5,11 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
-import ClipLoader from "react-spinners/ClipLoader";
+import ClipLoader from 'react-spinners/ClipLoader';
 import { useNavigate } from 'react-router-dom';
 import { ref, uploadBytes, getdownloadURl } from 'firebase/storage';
 import firebase from 'firebase';
-import { MultiSelect } from "react-multi-select-component";
+import { MultiSelect } from 'react-multi-select-component';
 // @mui
 import {
   Card,
@@ -54,13 +52,9 @@ const TABLE_HEAD = [
 
   { id: 'productImage', label: 'Product Image', alignRight: false },
   { id: 'productName', label: 'Product', alignRight: false },
-  { id: 'editdelete', label: 'Delete', alignRight: false },
+  { id: 'delete', label: 'Delete', alignRight: false },
 
-  // { id: 'email', label: 'Email', alignRight: false },
-  // { id: 'phone', label: 'Phone', alignRight: false },
-  // { id: 'address', label: 'Address', alignRight: false },
-  // { id: 'city', label: 'City', alignRight: false },
-  // { id: 'state', label: 'State', alignRight: false },
+  { id: 'edit', label: 'Edit', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -95,11 +89,10 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function BlogPage() {
-
   const options = [
-    { label: "Grapes 🍇", value: "grapes" },
-    { label: "Mango 🥭", value: "mango" },
-    { label: "Strawberry 🍓", value: "strawberry", disabled: true },
+    { label: 'Grapes 🍇', value: 'grapes' },
+    { label: 'Mango 🥭', value: 'mango' },
+    { label: 'Strawberry 🍓', value: 'strawberry', disabled: true },
   ];
   const [selected, setSelected] = useState([]);
   const [open, setOpen] = useState(null);
@@ -107,7 +100,6 @@ export default function BlogPage() {
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState('asc');
-
 
   const [USERLIST, setUserList] = useState([]);
 
@@ -118,16 +110,29 @@ export default function BlogPage() {
   const [selectedFile, setselectedFile] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open2, setOpen2] = useState(false);
+  const [open3, setOpen3] = useState(false);
   const [isImgUploaded, setIsImageUploaded] = useState(true);
   const [imagePath, setImagePath] = useState('');
   const [productName, setProduct] = useState('');
+  const [Editproduct, setEditProduct] = useState('');
+
+  const [editproductName, setEditProductName] = useState(Editproduct?.productName);
+  const [editproductImage, setEditProductImage] = useState(Editproduct?.productImage);
+  const [editproductCompany, setEditProductCompany] = useState([]);
   const onOpenModal = () => setOpen2(true);
   const onCloseModal = () => setOpen2(false);
+  const openEditModal = (row) => {
+    setEditProduct(row);
+    setEditProductName(row.productName)
+    setEditProductImage(row.productImage)
+    setOpen3(true);
+  };
+  const closeEditModal = () => setOpen3(false);
 
   useEffect(() => {
     fetchUser();
-    fetchCompany()
-    _getasync()
+    fetchCompany();
+    _getasync();
   }, []);
   const _getasync = async () => {
     const items = await localStorage.getItem('user_login');
@@ -138,67 +143,67 @@ export default function BlogPage() {
 
   const fetchCompany = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await axios.get('https://swrielapp.onrender.com/admin/allcompany');
       console.log(res, 'res');
-      setLoading(false)
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       } else {
-        const array = []
+        const array = [];
         res.data.result.map((item, index) => {
-          return array.push({ "label": item.companyName, "value": item._id })
-        })
+          return array.push({ label: item.companyName, value: item._id });
+        });
         // console.log(array, 'jkjk')
-        setCompany(array)
+        setCompany(array);
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error, 'error');
     }
   };
 
-
   const fetchUser = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await axios.get('https://swrielapp.onrender.com/admin/allproducts');
       console.log(res, 'res');
-      setLoading(false)
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       } else {
         setUserList(res.data.result);
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error, 'error');
     }
   };
 
   const deleteFunc = async (id) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteproduct/${id}`);
       console.log(res, 'res');
-      setLoading(false)
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       } else {
         fetchUser();
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error, 'error');
     }
   };
 
   const onFileUpload = async () => {
     // Create an object of formData
-    setLoading(true)
+    setLoading(true);
     const storageRef = firebase.storage().ref(`images/${selectedFile.name}`);
     const uploadTask = storageRef.put(selectedFile);
-    uploadTask.on('state_changed',
+    uploadTask.on(
+      'state_changed',
       (snapshot) => {
         // Observe state change events such as progress, pause, and resume
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -206,7 +211,7 @@ export default function BlogPage() {
         console.log(`Upload is ${progress}% done`);
       },
       (error) => {
-        setLoading(false)
+        setLoading(false);
         // Handle unsuccessful uploads
         alert(error);
       },
@@ -214,38 +219,37 @@ export default function BlogPage() {
         // Handle successful uploads on complete
         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
           console.log('File available at', downloadURL);
-          alert("Image Uploaded")
-          setLoading(false)
+          alert('Image Uploaded');
+          setLoading(false);
           setIsImageUploaded(false);
-          setImagePath(downloadURL)
+          setImagePath(downloadURL);
           // console.lo(downloadURL);
         });
       }
     );
-
   };
 
   const uploadService = async () => {
-    const companies = []
+    const companies = [];
     if (selected.length > 0) {
       selected.map((item, index) => {
-        return companies.push(item.value)
-      })
-      console.log(companies)
+        return companies.push(item.value);
+      });
+      console.log(companies);
     } else {
-      alert("Please Select Company")
+      alert('Please Select Company');
     }
     try {
       const dataobj = {
         productName,
         productImage: imagePath,
-        companies
+        companies,
       };
       console.log(dataobj, 'data obj');
-      setLoading(true)
+      setLoading(true);
       const res = await axios.post('https://swrielapp.onrender.com/admin/addproduct', dataobj);
       console.log(res, 'res');
-      setLoading(false)
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       }
@@ -257,11 +261,54 @@ export default function BlogPage() {
         alert('Product Added Successfully');
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error);
       alert('something went wrong');
     }
   };
+
+
+  const EditProduct = async () => {
+    const companies2 = [];
+    if (editproductCompany.length > 0) {
+      editproductCompany.map((item, index) => {
+        return companies2.push(item.value);
+      });
+      console.log(companies2);
+    } else {
+      alert('Please Select Company');
+    }
+    try {
+      const dataobj = {
+        _id: Editproduct._id,
+        productName: editproductName,
+        productImage: editproductImage,
+        companies: companies2,
+      };
+      console.log(dataobj, 'data obj');
+      setLoading(true);
+      const res = await axios.patch('https://swrielapp.onrender.com/admin/editproduct', dataobj);
+      console.log(res, 'update api');
+      setLoading(false);
+      if (res.data.status === 400) {
+        alert(res.data.message);
+      }
+      if (res.data.status === 200) {
+        setEditProductName('');
+        setEditProductImage('');
+        setEditProduct('')
+        setOpen3(false);
+        fetchUser();
+        alert('Product Edited Successfully');
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      alert('something went wrong');
+    }
+  };
+
+
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -334,7 +381,7 @@ export default function BlogPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Product Lists
+            Products
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
             Add Products
@@ -345,14 +392,7 @@ export default function BlogPage() {
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
-            <ClipLoader
-              color={'blue'}
-              loading={loading}
-
-              size={30}
-              aria-label="Loading Spinner"
-              data-testid="loader"
-            />
+            <ClipLoader color={'blue'} loading={loading} size={30} aria-label="Loading Spinner" data-testid="loader" />
             <Modal open={open2} onClose={onCloseModal} center>
               <Stack spacing={3}>
                 <Typography variant="h3" gutterBottom>
@@ -360,12 +400,7 @@ export default function BlogPage() {
                 </Typography>
                 <TextField name="Service" label="Products Name" onChange={(event) => setProduct(event.target.value)} />
 
-                <MultiSelect
-                  options={company}
-                  value={selected}
-                  onChange={setSelected}
-                  labelledBy="Select Companies"
-                />
+                <MultiSelect options={company} value={selected} onChange={setSelected} labelledBy="Select Companies" />
 
                 <Input onChange={onFileChange} type="file" hidden />
                 <Button variant="contained" component="label" onClick={onFileUpload}>
@@ -380,23 +415,74 @@ export default function BlogPage() {
         </Link> */}
               </Stack>
 
-              {loading ? <ClipLoader
-                color={'blue'}
-                loading={loading}
+              {loading ? (
+                <ClipLoader
+                  color={'blue'}
+                  loading={loading}
+                  size={30}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              ) : (
+                <LoadingButton
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  disabled={isImgUploaded}
+                  onClick={uploadService}
+                >
+                  Add
+                </LoadingButton>
+              )}
+            </Modal>
+            <Modal open={open3} onClose={closeEditModal} center>
+              <Stack spacing={3}>
+                <Typography variant="h3" gutterBottom>
+                  Edit Product
+                </Typography>
+                <TextField
+                  name="Service"
+                  value={editproductName}
+                  label="Products Name"
+                  onChange={(event) => setEditProductName(event.target.value)}
+                />
 
-                size={30}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-              /> : <LoadingButton
-                fullWidth
-                size="large"
-                type="submit"
-                variant="contained"
-                disabled={isImgUploaded}
-                onClick={uploadService}
-              >
-                Add
-              </LoadingButton>}
+                <MultiSelect options={company} value={editproductCompany} onChange={setEditProductCompany} labelledBy="Select Companies" />
+
+                {/* <Input onChange={onFileChange} type="file" hidden /> */}
+                {/* <Button variant="contained" component="label" onClick={onFileUpload}>
+                  Upload File
+                </Button> */}
+              </Stack>
+
+              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+                {/* <Checkbox name="remember" label="Remember me" />
+        <Link variant="subtitle2" underline="hover">
+          Forgot password?
+        </Link> */}
+              </Stack>
+
+              {loading ? (
+                <ClipLoader
+                  color={'blue'}
+                  loading={loading}
+                  size={30}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              ) : (
+                <LoadingButton
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  disabled={false}
+                  onClick={EditProduct}
+                >
+                  Update
+                </LoadingButton>
+              )}
             </Modal>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -425,11 +511,13 @@ export default function BlogPage() {
                             {/* <Typography variant="subtitle2" noWrap>
                               {name}
                             </Typography> */}
-                            <img src={productImage} alt={productImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
+                            <img
+                              src={productImage}
+                              alt={productImage}
+                              style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }}
+                            />
                           </Stack>
                         </TableCell>
-
-
 
                         <TableCell align="left">{productName}</TableCell>
 
@@ -446,7 +534,12 @@ export default function BlogPage() {
                             Delete
                           </MenuItem>
                         </TableCell>
-
+                        <TableCell align="left">
+                          <MenuItem sx={{ color: 'warning.main' }} onClick={() => openEditModal(row)}>
+                            <Iconify icon={'eva:pen'} sx={{ mr: 2 }} />
+                            Edit
+                          </MenuItem>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
