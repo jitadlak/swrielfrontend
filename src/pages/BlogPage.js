@@ -89,11 +89,6 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function BlogPage() {
-  const options = [
-    { label: 'Grapes 🍇', value: 'grapes' },
-    { label: 'Mango 🥭', value: 'mango' },
-    { label: 'Strawberry 🍓', value: 'strawberry', disabled: true },
-  ];
   const [selected, setSelected] = useState([]);
   const [open, setOpen] = useState(null);
   const navigate = useNavigate();
@@ -123,8 +118,8 @@ export default function BlogPage() {
   const onCloseModal = () => setOpen2(false);
   const openEditModal = (row) => {
     setEditProduct(row);
-    setEditProductName(row.productName)
-    setEditProductImage(row.productImage)
+    setEditProductName(row.productName);
+    setEditProductImage(row.productImage);
     setOpen3(true);
   };
   const closeEditModal = () => setOpen3(false);
@@ -267,7 +262,6 @@ export default function BlogPage() {
     }
   };
 
-
   const EditProduct = async () => {
     const companies2 = [];
     if (editproductCompany.length > 0) {
@@ -296,7 +290,7 @@ export default function BlogPage() {
       if (res.data.status === 200) {
         setEditProductName('');
         setEditProductImage('');
-        setEditProduct('')
+        setEditProduct('');
         setOpen3(false);
         fetchUser();
         alert('Product Edited Successfully');
@@ -307,8 +301,6 @@ export default function BlogPage() {
       alert('something went wrong');
     }
   };
-
-
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -448,7 +440,12 @@ export default function BlogPage() {
                   onChange={(event) => setEditProductName(event.target.value)}
                 />
 
-                <MultiSelect options={company} value={editproductCompany} onChange={setEditProductCompany} labelledBy="Select Companies" />
+                <MultiSelect
+                  options={company}
+                  value={editproductCompany}
+                  onChange={setEditProductCompany}
+                  labelledBy="Select Companies"
+                />
 
                 {/* <Input onChange={onFileChange} type="file" hidden /> */}
                 {/* <Button variant="contained" component="label" onClick={onFileUpload}>

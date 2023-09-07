@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-import ClipLoader from "react-spinners/ClipLoader";
+import ClipLoader from 'react-spinners/ClipLoader';
 // @mui
 import {
   Card,
@@ -103,22 +103,21 @@ export default function UserPage() {
     if (!items) {
       navigate('/login', { replace: false });
     }
-
-  }
+  };
   const fetchUser = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       const res = await axios.get('https://swrielapp.onrender.com/user/users');
       console.log(res, 'res');
-      setLoading(false)
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       } else {
         setUserList(res.data.result);
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error, 'error');
     }
   };
@@ -202,14 +201,7 @@ export default function UserPage() {
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
-            <ClipLoader
-              color={'blue'}
-              loading={loading}
-
-              size={30}
-              aria-label="Loading Spinner"
-              data-testid="loader"
-            />
+            <ClipLoader color={'blue'} loading={loading} size={30} aria-label="Loading Spinner" data-testid="loader" />
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
                 <UserListHead
@@ -228,7 +220,6 @@ export default function UserPage() {
 
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-
                         <TableCell padding="checkbox">
                           {/* <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} /> */}
                         </TableCell>
@@ -236,7 +227,11 @@ export default function UserPage() {
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="subtitle2" noWrap>
-                              <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png' alt='jdk' style={{ height: 80, borderRadius: 40, margin: 10 }} />
+                              <img
+                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+                                alt="jdk"
+                                style={{ height: 80, borderRadius: 40, margin: 10 }}
+                              />
                             </Typography>
                           </Stack>
                         </TableCell>
@@ -260,7 +255,6 @@ export default function UserPage() {
                   })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
-
                       <TableCell colSpan={6} />
                     </TableRow>
                   )}
@@ -270,7 +264,6 @@ export default function UserPage() {
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-
                         <Paper
                           sx={{
                             textAlign: 'center',

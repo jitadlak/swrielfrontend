@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
-import ClipLoader from "react-spinners/ClipLoader";
+import ClipLoader from 'react-spinners/ClipLoader';
 import { useNavigate } from 'react-router-dom';
 import { ref, uploadBytes, getdownloadURl } from 'firebase/storage';
 import firebase from 'firebase';
@@ -115,57 +115,55 @@ export default function ProductPage() {
   const onCloseModal = () => setOpen2(false);
 
   useEffect(() => {
-    fetchUser(); _getasync()
+    fetchUser();
+    _getasync();
   }, []);
   const _getasync = async () => {
     const items = await localStorage.getItem('user_login');
     if (!items) {
       navigate('/login', { replace: false });
     }
-
-  }
+  };
   const fetchUser = async () => {
-
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await axios.get('https://swrielapp.onrender.com/admin/allservices');
       console.log(res, 'res');
-      setLoading(false)
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       } else {
         setUserList(res.data.result);
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error, 'error');
     }
   };
 
   const deleteFunc = async (id) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteservice/${id}`);
       console.log(res, 'res');
-      setLoading(false)
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       } else {
         fetchUser();
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error, 'error');
     }
   };
 
   const onFileUpload = async () => {
-
-
-    setLoading(true)
+    setLoading(true);
     const storageRef = firebase.storage().ref(`images/${selectedFile.name}`);
     const uploadTask = storageRef.put(selectedFile);
-    uploadTask.on('state_changed',
+    uploadTask.on(
+      'state_changed',
       (snapshot) => {
         // Observe state change events such as progress, pause, and resume
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -173,7 +171,7 @@ export default function ProductPage() {
         console.log(`Upload is ${progress}% done`);
       },
       (error) => {
-        setLoading(false)
+        setLoading(false);
         // Handle unsuccessful uploads
         alert(error);
       },
@@ -181,18 +179,14 @@ export default function ProductPage() {
         // Handle successful uploads on complete
         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
           console.log('File available at', downloadURL);
-          alert("Image Uploaded")
-          setLoading(false)
+          alert('Image Uploaded');
+          setLoading(false);
           setIsImageUploaded(false);
-          setImagePath(downloadURL)
+          setImagePath(downloadURL);
           // console.lo(downloadURL);
         });
       }
     );
-
-
-
-
 
     // Create an object of formData
     // const formData = new FormData();
@@ -214,14 +208,12 @@ export default function ProductPage() {
     //   setImagePath(res.data.path);
     //   alert('Image Uploaded')
     // }
-
   };
 
   const uploadService = async () => {
     try {
-
       if (!serviceName && !imagePath) {
-        alert('Serivce Name & Service Image Required')
+        alert('Serivce Name & Service Image Required');
       }
 
       const dataobj = {
@@ -229,10 +221,10 @@ export default function ProductPage() {
         serviceImage: imagePath,
       };
       console.log(dataobj, 'data obj');
-      setLoading(true)
+      setLoading(true);
       const res = await axios.post('https://swrielapp.onrender.com/admin/addservice', dataobj);
       console.log(res, 'res');
-      setLoading(false)
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       }
@@ -244,7 +236,7 @@ export default function ProductPage() {
         alert('Service Added Successfully');
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error);
       alert('something went wrong');
     }
@@ -332,14 +324,7 @@ export default function ProductPage() {
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
-            <ClipLoader
-              color={'blue'}
-              loading={loading}
-
-              size={30}
-              aria-label="Loading Spinner"
-              data-testid="loader"
-            />
+            <ClipLoader color={'blue'} loading={loading} size={30} aria-label="Loading Spinner" data-testid="loader" />
             <Modal open={open2} onClose={onCloseModal} center>
               <Stack spacing={3}>
                 <Typography variant="h3" gutterBottom>
@@ -347,16 +332,19 @@ export default function ProductPage() {
                 </Typography>
                 <TextField name="Service" label="Service Name" onChange={(event) => setService(event.target.value)} />
                 <Input onChange={onFileChange} type="file" hidden />
-                {loading ? <ClipLoader
-                  color={'blue'}
-                  loading={loading}
-
-                  size={30}
-                  aria-label="Loading Spinner"
-                  data-testid="loader"
-                /> : <Button variant="contained" component="label" onClick={onFileUpload}>
-                  Upload File
-                </Button>}
+                {loading ? (
+                  <ClipLoader
+                    color={'blue'}
+                    loading={loading}
+                    size={30}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                  />
+                ) : (
+                  <Button variant="contained" component="label" onClick={onFileUpload}>
+                    Upload File
+                  </Button>
+                )}
               </Stack>
 
               <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
@@ -366,23 +354,26 @@ export default function ProductPage() {
         </Link> */}
               </Stack>
 
-              {loading ? <ClipLoader
-                color={'blue'}
-                loading={loading}
-
-                size={30}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-              /> : <LoadingButton
-                fullWidth
-                size="large"
-                type="submit"
-                variant="contained"
-                disabled={isImgUploaded}
-                onClick={uploadService}
-              >
-                Add
-              </LoadingButton>}
+              {loading ? (
+                <ClipLoader
+                  color={'blue'}
+                  loading={loading}
+                  size={30}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              ) : (
+                <LoadingButton
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  disabled={isImgUploaded}
+                  onClick={uploadService}
+                >
+                  Add
+                </LoadingButton>
+              )}
             </Modal>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
