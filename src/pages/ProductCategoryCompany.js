@@ -261,6 +261,7 @@ export default function ProductCategoryCompany() {
         alert(res.data.message);
       }
       if (res.data.status === 200) {
+        setImagePath('');
         setOpen2(false);
         fetchUser();
         alert('Product Added Successfully');
@@ -547,7 +548,7 @@ export default function ProductCategoryCompany() {
                                                       <img src={productImage} alt={productImage} style={{ height: 100, width: 100, margin: 20 }} />
                                                 </TableCell> */}
                         <TableCell align="left">{_id}</TableCell>
-                        <TableCell align="left">{' not found'}</TableCell>
+                        <TableCell align="left">{productImage ?     <img src={productImage} alt={productImage} style={{ height: 100, width: 100, margin: 20 }} /> : {' not found'} }</TableCell>
                         <TableCell align="left">{productName}</TableCell>
 
                         <TableCell align="left">{productPrice} ₹</TableCell>
