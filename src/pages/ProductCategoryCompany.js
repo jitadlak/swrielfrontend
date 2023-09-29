@@ -368,9 +368,9 @@ export default function ProductCategoryCompany() {
           <Typography variant="h4" gutterBottom>
             Product Lists
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
+  {loading ? null :   <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
             Add Products
-          </Button>
+          </Button>}
         </Stack>
 
         <Card>
