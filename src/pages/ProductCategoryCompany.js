@@ -262,7 +262,7 @@ export default function ProductCategoryCompany() {
       }
       if (res.data.status === 200) {
         setProductName('');
-        setProductImage('');
+       
         setProductPrice('');
         setProductTitle('');
         setProductSubcategoryId('');
