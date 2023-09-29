@@ -261,6 +261,13 @@ export default function ProductCategoryCompany() {
         alert(res.data.message);
       }
       if (res.data.status === 200) {
+        setProductName('');
+        setProductImage('');
+        setProductPrice('');
+        setProductTitle('');
+        setProductSubcategoryId('');
+        setProductDescription('');
+        setProductCompany('');
         setImagePath('');
         setOpen2(false);
         fetchUser();
