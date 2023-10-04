@@ -231,7 +231,7 @@ export default function ProductCategoryCompany() {
         // Handle successful uploads on complete
         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
           console.log('File available at', downloadURL);
-          alert('Image Uploaded');
+          alert('Image Uploaded',downloadURL);
           setLoading(false);
           setIsImageUploaded(false);
           setImagePath(downloadURL);
@@ -259,6 +259,7 @@ export default function ProductCategoryCompany() {
       console.log(res, 'resaddcategory');
       if (res.data.status === 400) {
         alert(res.data.message);
+       setImagePath("");
       }
       if (res.data.status === 200) {
         setProductName('');
@@ -268,7 +269,7 @@ export default function ProductCategoryCompany() {
         setProductSubcategoryId('');
         setProductDescription('');
         setProductCompany('');
-        setImagePath('');
+        setImagePath("");
         setOpen2(false);
         fetchUser();
         alert('Product Added Successfully');
