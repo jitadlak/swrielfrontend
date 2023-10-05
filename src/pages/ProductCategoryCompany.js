@@ -231,7 +231,8 @@ export default function ProductCategoryCompany() {
         // Handle successful uploads on complete
         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
           console.log('File available at', downloadURL);
-          alert('Image Uploaded',downloadURL);
+          alert('Image Uploaded');
+             alert(downloadURL);
           setLoading(false);
           setIsImageUploaded(false);
           setImagePath(downloadURL);
