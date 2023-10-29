@@ -57,7 +57,8 @@ const TABLE_HEAD = [
   { id: 'productSubcategory', label: 'Category', alignRight: false },
   { id: 'createdAt', label: 'createdAt', alignRight: false },
   { id: 'update', label: 'Update Price', alignRight: false },
-  { id: 'editdelete', label: 'Delete', alignRight: false },
+  { id: 'update', label: 'Update Product', alignRight: false },
+  // { id: 'edit', label: 'Edit', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -86,7 +87,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.productName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.categoryName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -110,10 +111,13 @@ export default function ProductCategoryCompany() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open2, setOpen2] = useState(false);
   const [open3, setOpen3] = useState(false);
+  const [open4, setOpen4] = useState(false);
   const [isImgUploaded, setIsImageUploaded] = useState(true);
   const [imagePath, setImagePath] = useState('');
   const [newPrice, setNewPrice] = useState('');
   const [updatedId, setupdateId] = useState('');
+  const [updatedProductName, setUpdatedProductName] = useState('');
+  const [updatedProductTitle, setUpdatedProductTitle] = useState('');
   const [productName, setProductName] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [productTitle, setProductTitle] = useState('');
@@ -130,6 +134,14 @@ export default function ProductCategoryCompany() {
   const onCloseModal3 = () => {
     setupdateId('');
     setOpen3(false);
+  };
+  const onOpenModal4 = (_id) => {
+    setupdateId(_id);
+    setOpen4(true);
+  };
+  const onCloseModal4 = () => {
+    setupdateId('');
+    setOpen4(false);
   };
 
   useEffect(() => {
@@ -195,19 +207,19 @@ export default function ProductCategoryCompany() {
     }
   };
 
-  const deleteFunc = async (id) => {
-    try {
-      const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteproductlist/${id}`);
-      console.log(res, 'res');
-      if (res.data.status === 400) {
-        alert(res.data.message);
-      } else {
-        fetchUser();
-      }
-    } catch (error) {
-      console.log(error, 'error');
-    }
-  };
+  // const deleteFunc = async (id) => {
+  //     try {
+  //         const res = await axios.delete(`https://swrielapp.onrender.com/admin/deleteservicecategory/${id}`);
+  //         console.log(res, 'res');
+  //         if (res.data.status === 400) {
+  //             alert(res.data.message);
+  //         } else {
+  //             fetchUser();
+  //         }
+  //     } catch (error) {
+  //         console.log(error, 'error');
+  //     }
+  // };
 
   const onFileUpload = async () => {
     // Create an object of formData
@@ -232,7 +244,6 @@ export default function ProductCategoryCompany() {
         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
           console.log('File available at', downloadURL);
           alert('Image Uploaded');
-             alert(downloadURL);
           setLoading(false);
           setIsImageUploaded(false);
           setImagePath(downloadURL);
@@ -260,17 +271,8 @@ export default function ProductCategoryCompany() {
       console.log(res, 'resaddcategory');
       if (res.data.status === 400) {
         alert(res.data.message);
-       setImagePath("");
       }
       if (res.data.status === 200) {
-        setProductName('');
-       
-        setProductPrice('');
-        setProductTitle('');
-        setProductSubcategoryId('');
-        setProductDescription('');
-        setProductCompany('');
-        setImagePath("");
         setOpen2(false);
         fetchUser();
         alert('Product Added Successfully');
@@ -297,6 +299,32 @@ export default function ProductCategoryCompany() {
       } else {
         setOpen3(false);
         fetchUser();
+        setupdateId('');
+        alert(res.data?.result?.message);
+      }
+    } catch (error) {
+      console.log(error, 'error');
+    }
+  };
+  const updateProduct = async () => {
+    try {
+      const data = {
+        updatedId,
+        productName: updatedProductName,
+        productImage: imagePath,
+        productTitle: updatedProductTitle,
+      };
+
+      // console.log(data, 'update balance api')
+      const res = await axios.patch('https://swrielapp.onrender.com/admin/updateproduct', data);
+      console.log(res, 'res');
+      if (res.data.status === 400) {
+        alert(res.data?.message);
+      } else {
+        setOpen4(false);
+        fetchUser();
+        setupdateId('');
+        setImagePath('');
         alert(res.data?.result?.message);
       }
     } catch (error) {
@@ -377,9 +405,9 @@ export default function ProductCategoryCompany() {
           <Typography variant="h4" gutterBottom>
             Product Lists
           </Typography>
-  {loading ? null :   <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
             Add Products
-          </Button>}
+          </Button>
         </Stack>
 
         <Card>
@@ -517,6 +545,65 @@ export default function ProductCategoryCompany() {
                 </LoadingButton>
               )}
             </Modal>
+            <Modal open={open4} onClose={onCloseModal4}>
+              <Stack spacing={4}>
+                <Typography variant="h3" gutterBottom>
+                  Update Product
+                </Typography>
+
+                <TextField
+                  name="Product Name"
+                  label="Product Name"
+                  onChange={(event) => setUpdatedProductName(event.target.value)}
+                />
+
+                <TextField
+                  name="Product Title"
+                  label="Product Title"
+                  onChange={(event) => setUpdatedProductTitle(event.target.value)}
+                />
+
+                {/* <TextField name="Product Company" label="Product Company" onChange={(event) => setProductCompany(event.target.value)} /> */}
+              </Stack>
+
+              <Typography variant="h6" gutterBottom>
+                Select Product Image
+              </Typography>
+              <Input onChange={onFileChange} type="file" hidden />
+              {loading ? (
+                <ClipLoader
+                  color={'blue'}
+                  loading={loading}
+                  size={30}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              ) : (
+                <Button variant="contained" component="label" onClick={onFileUpload}>
+                  Upload File
+                </Button>
+              )}
+
+              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+                {/* <Checkbox name="remember" label="Remember me" />
+        <Link variant="subtitle2" underline="hover">
+          Forgot password?
+        </Link> */}
+              </Stack>
+              {loading ? (
+                <ClipLoader
+                  color={'blue'}
+                  loading={loading}
+                  size={30}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              ) : (
+                <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={uploadService}>
+                  Update
+                </LoadingButton>
+              )}
+            </Modal>
 
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -554,10 +641,12 @@ export default function ProductCategoryCompany() {
                                                     <Stack direction="row" alignItems="center" spacing={2}>
                                                         <img src={`https://swrielapp.onrender.com/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
                                                     </Stack>
-                                                      <img src={productImage} alt={productImage} style={{ height: 100, width: 100, margin: 20 }} />
                                                 </TableCell> */}
                         <TableCell align="left">{_id}</TableCell>
-                        <TableCell align="left">{productImage ?     <img src={productImage} alt={productImage} style={{ height: 100, width: 100, margin: 20 }} /> : null }</TableCell>
+                        <TableCell align="left">
+                          {' '}
+                          <img src={productImage} alt={productImage} style={{ height: 100, width: 100, margin: 20 }} />
+                        </TableCell>
                         <TableCell align="left">{productName}</TableCell>
 
                         <TableCell align="left">{productPrice} ₹</TableCell>
@@ -579,9 +668,8 @@ export default function ProductCategoryCompany() {
                           </MenuItem>
                         </TableCell>
                         <TableCell align="left">
-                          <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteFunc(_id)}>
-                            <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-                            Delete
+                          <MenuItem sx={{ color: 'success.main' }} onClick={() => onOpenModal4(_id)}>
+                            Update Product
                           </MenuItem>
                         </TableCell>
                         {/* <TableCell align="left">
@@ -628,7 +716,7 @@ export default function ProductCategoryCompany() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            rowsPerPageOptions={[5, 10, 25]}
             component="div"
             count={USERLIST.length}
             rowsPerPage={rowsPerPage}
