@@ -307,6 +307,7 @@ export default function ProductCategoryCompany() {
     }
   };
   const updateProduct = async () => {
+    setLoading(true);
     try {
       const data = {
         updatedId,
@@ -318,6 +319,7 @@ export default function ProductCategoryCompany() {
       // console.log(data, 'update balance api')
       const res = await axios.patch('https://swrielapp.onrender.com/admin/updateproduct', data);
       console.log(res, 'res');
+      setLoading(false);
       if (res.data.status === 400) {
         alert(res.data?.message);
       } else {
@@ -599,7 +601,7 @@ export default function ProductCategoryCompany() {
                   data-testid="loader"
                 />
               ) : (
-                <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={uploadService}>
+                <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={updateProduct}>
                   Update
                 </LoadingButton>
               )}
