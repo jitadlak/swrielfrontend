@@ -718,7 +718,7 @@ export default function ProductCategoryCompany() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[10, 50, 100,200]}
             component="div"
             count={USERLIST.length}
             rowsPerPage={rowsPerPage}
