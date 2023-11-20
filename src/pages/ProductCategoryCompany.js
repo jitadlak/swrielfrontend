@@ -57,7 +57,7 @@ const TABLE_HEAD = [
   { id: 'productSubcategory', label: 'Category', alignRight: false },
   { id: 'createdAt', label: 'createdAt', alignRight: false },
   { id: 'update', label: 'Update Price', alignRight: false },
-  { id: 'update', label: 'Update Product', alignRight: false },
+  { id: 'updateProduct', label: 'Update Product', alignRight: false },
   // { id: 'edit', label: 'Edit', alignRight: false },
 ];
 
