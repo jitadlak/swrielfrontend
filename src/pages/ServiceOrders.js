@@ -133,7 +133,7 @@ export default function ServiceOrders() {
       if (res.data.status === 400) {
         alert(res.data.message);
       } else {
-        setUserList(res.data.result);
+        setUserList(res?.data?.result?.reverse();
       }
     } catch (error) {
       setLoading(false);
