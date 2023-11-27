@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import axios from 'axios';
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
@@ -103,12 +103,13 @@ export default function ProductCategoryCompany() {
   const [USERLIST, setUserList] = useState([]);
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loading1, setLoading1] = useState(false);
   const [orderBy, setOrderBy] = useState('name');
 
   const [filterName, setFilterName] = useState('');
   const [companyId, setCompanyId] = useState('');
   const [selectedFile, setselectedFile] = useState(null);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
   const [open2, setOpen2] = useState(false);
   const [open3, setOpen3] = useState(false);
   const [open4, setOpen4] = useState(false);
@@ -144,12 +145,19 @@ export default function ProductCategoryCompany() {
     setOpen4(false);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchUser();
     fetchUser2();
     fetchUser3();
     _getasync();
   }, []);
+
+  // useEffect(() => {
+  //   fetchUser();
+  //   fetchUser2();
+  //   fetchUser3();
+  //   _getasync();
+  // }, [USERLIST]);
   const _getasync = async () => {
     const items = await localStorage.getItem('user_login');
     if (!items) {
@@ -158,17 +166,17 @@ export default function ProductCategoryCompany() {
   };
   const fetchUser = async () => {
     try {
-      setLoading(true);
+      setLoading1(true);
       const res = await axios.get('https://swrielapp.onrender.com/admin/allproductslists');
       console.log(res, 'res');
-      setLoading(false);
+      setLoading1(false);
       if (res.data.status === 400) {
         alert(res.data.message);
       } else {
-        setUserList(res.data.result);
+        setUserList(res?.data?.result?.reverse());
       }
     } catch (error) {
-      setLoading(false);
+      setLoading1(false);
       console.log(error, 'error');
     }
   };
@@ -386,7 +394,7 @@ export default function ProductCategoryCompany() {
     setFilterName(event.target.value);
   };
 
-  const Userlist = [];
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
   const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
@@ -399,7 +407,7 @@ export default function ProductCategoryCompany() {
   return (
     <>
       <Helmet>
-        <title> User | Minimal UI </title>
+        <title> Products | Minimal UI </title>
       </Helmet>
 
       <Container>
@@ -417,6 +425,7 @@ export default function ProductCategoryCompany() {
 
           <Scrollbar>
             <ClipLoader color={'blue'} loading={loading} size={30} aria-label="Loading Spinner" data-testid="loader" />
+            <ClipLoader color={'blue'} loading={loading1} size={30} aria-label="Loading Spinner" data-testid="loader" />
             <Modal open={open2} onClose={onCloseModal}>
               <Stack spacing={4}>
                 <Typography variant="h3" gutterBottom>
