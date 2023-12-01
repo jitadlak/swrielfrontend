@@ -30,6 +30,7 @@ import Offers from './pages/Offers';
 import Companies from './pages/Companies';
 import SendNotification from './pages/SendNotification';
 import ServicePromotions from './pages/ServicePromotions';
+import AddProductList from './pages/AddProductList';
 
 
 // ----------------------------------------------------------------------
@@ -70,6 +71,7 @@ export default function Router() {
         { path: 'allbanksdetails', element: <AllBanksDetails /> },
         { path: 'offers', element: <Offers /> },
         { path: 'sendnotification', element: <SendNotification /> },
+        { path: 'addproductlist', element: <AddProductList /> },
       ],
     },
 
