@@ -62,6 +62,11 @@ const navConfig = [
     icon: icon('ic_lock'),
   },
   {
+    title: 'ADD PRODUCT LIST',
+    path: '/dashboard/addproductlist',
+    icon: icon('ic_lock'),
+  },
+  {
     title: 'PRODUCTS PROMOTIONS',
     path: '/dashboard/promotions',
     icon: icon('ic_analytics'),
