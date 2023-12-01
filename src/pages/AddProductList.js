@@ -92,7 +92,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function ProductCategoryCompany() {
+export default function AddProdu() {
   const [open, setOpen] = useState(null);
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
@@ -146,9 +146,9 @@ export default function ProductCategoryCompany() {
   };
 
   useLayoutEffect(() => {
-    fetchUser();
-    // fetchUser2();
-    // fetchUser3();
+    // fetchUser();
+    fetchUser2();
+    fetchUser3();
     _getasync();
   }, []);
 
@@ -282,7 +282,7 @@ export default function ProductCategoryCompany() {
       }
       if (res.data.status === 200) {
         setOpen2(false);
-        fetchUser();
+       
         alert('Product Added Successfully');
       }
     } catch (error) {
@@ -413,19 +413,19 @@ export default function ProductCategoryCompany() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Product Lists
+           ADD Product Lists
           </Typography>
-          {/* <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={onOpenModal}>
             Add Products
-          </Button> */}
+          </Button>
         </Stack>
 
         <Card>
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
-        
-            <ClipLoader color={'blue'} loading={loading1} size={30} aria-label="Loading Spinner" data-testid="loader" />
+            <ClipLoader color={'blue'} loading={loading} size={30} aria-label="Loading Spinner" data-testid="loader" />
+            {/* <ClipLoader color={'blue'} loading={loading1} size={30} aria-label="Loading Spinner" data-testid="loader" /> */}
             <Modal open={open2} onClose={onCloseModal}>
               <Stack spacing={4}>
                 <Typography variant="h3" gutterBottom>
@@ -616,125 +616,10 @@ export default function ProductCategoryCompany() {
               )}
             </Modal>
 
-            <TableContainer sx={{ minWidth: 800 }}>
-              <Table>
-                <UserListHead
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
-                  numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
-                />
-                <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const {
-                      _id,
-                      productName,
-                      productImage,
-                      productTitle,
-                      createdAt,
-                      productDescription,
-                      productSubcategory,
-                      productCompany,
-                      productPrice,
-                    } = row;
-                    const selectedUser = selected.indexOf(productName) !== -1;
-
-                    return (
-                      <TableRow hover key={_id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                        <TableCell padding="checkbox">
-                          {/* <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, productName)} /> */}
-                        </TableCell>
-
-                        {/* <TableCell component="th" scope="row" padding="none">
-                                                    <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <img src={`https://swrielapp.onrender.com/${serviceImage}`} alt={serviceImage} style={{ height: 80, width: 80, alignSelf: 'center', margin: 20 }} />
-                                                    </Stack>
-                                                </TableCell> */}
-                        <TableCell align="left">{_id}</TableCell>
-                        <TableCell align="left">
-                          {' '}
-                          <img src={productImage} alt={productImage} style={{ height: 100, width: 100, margin: 20 }} />
-                        </TableCell>
-                        <TableCell align="left">{productName}</TableCell>
-
-                        <TableCell align="left">{productPrice} ₹</TableCell>
-                        <TableCell align="left">{productTitle}</TableCell>
-                        {/* <TableCell align="left">{productDescription}</TableCell> */}
-                        <TableCell align="left">{productCompany?.companyName}</TableCell>
-                        <TableCell align="left">{productSubcategory.productData.productName}</TableCell>
-                        <TableCell align="left">{createdAt}</TableCell>
-                        {/* <TableCell align="left">{email}</TableCell>
-
-                        <TableCell align="left">{phone}</TableCell>
-                        <TableCell align="left">{address}</TableCell>
-                        <TableCell align="left">{city}</TableCell>
-                        <TableCell align="left">{state}</TableCell> */}
-
-                        <TableCell align="left">
-                          <MenuItem sx={{ color: 'success.main' }} onClick={() => onOpenModal3(_id)}>
-                            Update Price
-                          </MenuItem>
-                        </TableCell>
-                        <TableCell align="left">
-                          <MenuItem sx={{ color: 'success.main' }} onClick={() => onOpenModal4(_id)}>
-                            Update Product
-                          </MenuItem>
-                        </TableCell>
-                        {/* <TableCell align="left">
-                                                    <MenuItem>
-                                                        <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-                                                        Edit
-                                                    </MenuItem>
-                                                </TableCell> */}
-                      </TableRow>
-                    );
-                  })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-
-                {isNotFound && (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <Paper
-                          sx={{
-                            textAlign: 'center',
-                          }}
-                        >
-                          <Typography variant="h6" paragraph>
-                            Not found
-                          </Typography>
-
-                          <Typography variant="body2">
-                            No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                )}
-              </Table>
-            </TableContainer>
+         
           </Scrollbar>
 
-          <TablePagination
-            rowsPerPageOptions={[10, 50, 100,200]}
-            component="div"
-            count={USERLIST.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+     
         </Card>
       </Container>
 
