@@ -55,6 +55,7 @@ const TABLE_HEAD = [
   { id: 'delete', label: 'Delete', alignRight: false },
 
   { id: 'edit', label: 'Edit', alignRight: false },
+  { id: 'change Image', label: 'Change Image', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -106,6 +107,7 @@ export default function BlogPage() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open2, setOpen2] = useState(false);
   const [open3, setOpen3] = useState(false);
+  const [open4, setOpen4] = useState(false);
   const [isImgUploaded, setIsImageUploaded] = useState(true);
   const [imagePath, setImagePath] = useState('');
   const [productName, setProduct] = useState('');
@@ -122,7 +124,14 @@ export default function BlogPage() {
     setEditProductImage(row.productImage);
     setOpen3(true);
   };
+  const openEditModal2 = (row) => {
+    setEditProduct(row);
+    // setEditProductName(row.productName);
+    // setEditProductImage(row.productImage);
+    setOpen4(true);
+  };
   const closeEditModal = () => setOpen3(false);
+  const closeEditModal2 = () => setOpen4(false);
 
   useEffect(() => {
     fetchUser();
@@ -292,6 +301,41 @@ export default function BlogPage() {
         setEditProductImage('');
         setEditProduct('');
         setOpen3(false);
+        fetchUser();
+        alert('Product Edited Successfully');
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      alert('something went wrong');
+    }
+  };
+  const EditProductImage = async () => {
+
+ 
+    try {
+      const dataobj = {
+        _id: Editproduct._id,
+        productName: Editproduct.productName,
+    
+        companies: Editproduct.companies,
+        productImage: imagePath,
+   
+      };
+      console.log(dataobj, 'data obj');
+      setLoading(true);
+      const res = await axios.patch('https://swrielapp.onrender.com/admin/editproduct', dataobj);
+      console.log(res, 'update api');
+      setLoading(false);
+      if (res.data.status === 400) {
+        alert(res.data.message);
+      }
+      if (res.data.status === 200) {
+        setEditProductName('');
+        setEditProductImage('');
+        setEditProduct('');
+        setImagePath("");
+        setOpen4(false);
         fetchUser();
         alert('Product Edited Successfully');
       }
@@ -481,6 +525,49 @@ export default function BlogPage() {
                 </LoadingButton>
               )}
             </Modal>
+            <Modal open={open4} onClose={closeEditModal2} center>
+              <Stack spacing={3}>
+                <Typography variant="h3" gutterBottom>
+                  Edit Product
+                </Typography>
+              
+
+              
+
+                <Input onChange={onFileChange} type="file" hidden />
+                <Button variant="contained" component="label" onClick={onFileUpload}>
+                  Upload File
+                </Button>
+              </Stack>
+
+              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+                {/* <Checkbox name="remember" label="Remember me" />
+        <Link variant="subtitle2" underline="hover">
+          Forgot password?
+        </Link> */}
+              </Stack>
+
+              {loading ? (
+                <ClipLoader
+                  color={'blue'}
+                  loading={loading}
+                  size={30}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              ) : (
+                <LoadingButton
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  disabled={false}
+                  onClick={EditProductImage}
+                >
+                  Update
+                </LoadingButton>
+              )}
+            </Modal>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
                 <UserListHead
@@ -535,6 +622,12 @@ export default function BlogPage() {
                           <MenuItem sx={{ color: 'warning.main' }} onClick={() => openEditModal(row)}>
                             <Iconify icon={'eva:pen'} sx={{ mr: 2 }} />
                             Edit
+                          </MenuItem>
+                        </TableCell>
+                        <TableCell align="left">
+                          <MenuItem sx={{ color: 'warning.main' }} onClick={() => openEditModal2(row)}>
+                            <Iconify icon={'eva:pen'} sx={{ mr: 2 }} />
+                            Update Image
                           </MenuItem>
                         </TableCell>
                       </TableRow>
